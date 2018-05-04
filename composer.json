@@ -1,11 +1,11 @@
 {
-  "name": "tribe-products-extensions/tribe-ext-pdf-tickets",
+  "name": "tribe-ext-pdf-tickets",
   "description": "RSVP, WooCommerce, and Easy Digital Downloads will become PDFs (will be saved to your Uploads directory) and attached to the ticket email.",
   "type": "project",
   "require": {
     "mpdf/mpdf": "^7.0"
   },
-  "license": "GPLv2",
+  "license": "GPL-2.0-only",
   "authors": [
     {
       "name": "Modern Tribe, Inc.",

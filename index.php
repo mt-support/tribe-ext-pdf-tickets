@@ -8,6 +8,7 @@
  * Author URI:      http://m.tri.be/1971
  * License:         GPLv2 or later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
+ * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
  */
 
 // Do not load unless Tribe Common is fully loaded.

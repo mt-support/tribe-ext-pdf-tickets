@@ -9,6 +9,7 @@
  * License:         GPLv2 or later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
+ * Text Domain:       tribe-ext-pdf-tickets
  */
 
 // Do not load unless Tribe Common is fully loaded.
@@ -106,6 +107,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	public function init() {
 		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 			$message = '<p>' . $this->get_name();
+		// Load plugin textdomain
+		load_plugin_textdomain( 'tribe-ext-pdf-tickets', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 
 			$message .= __( ' requires PHP 5.6 or newer to work (as well as the `mbstring` and `gd` PHP extensions). Please contact your website host and inquire about updating PHP.', 'tribe-extension' );
 
@@ -153,7 +156,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			$message = '<p style="font-style: italic">';
 
-			$message .= sprintf( esc_html__( 'Permalinks must be enabled in order to use %s.', 'tribe-extension' ), $this->get_name() );
+			$message .= sprintf( esc_html__( 'Permalinks must be enabled in order to use %s.', 'tribe-ext-pdf-tickets' ), $this->get_name() );
 
 			$message .= '</p>';
 
@@ -163,10 +166,10 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 				$message .= sprintf( '<a href="%s">%s</a>',
 					esc_url( admin_url( 'options-permalink.php' ) ),
-					__( 'Change your Permalink settings', 'tribe-extension' )
+					__( 'Change your Permalink settings', 'tribe-ext-pdf-tickets' )
 				);
 
-				$message .= __( ' or deactivate this plugin.', 'tribe-extension' );
+				$message .= __( ' or deactivate this plugin.', 'tribe-ext-pdf-tickets' );
 
 				$message .= '</p>';
 			}
@@ -394,7 +397,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 		$base = sprintf( '%s_%s',
 			sanitize_title_with_dashes( $tickets_bases['tickets'][0] ),
-			sanitize_key( __( 'download', 'tribe-extension' ) )
+			sanitize_key( __( 'download', 'tribe-ext-pdf-tickets' ) )
 		);
 
 		return $base;
@@ -692,7 +695,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * @return string
 	 */
 	protected function ticket_link( $attendee_id ) {
-		$text = __( 'PDF Ticket', 'tribe-extension' );
+		$text = __( 'PDF Ticket', 'tribe-ext-pdf-tickets' );
 
 		/**
 		 * Filter to control the link target for Attendees Report links.

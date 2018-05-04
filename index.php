@@ -1,22 +1,22 @@
 <?php
 /**
- * Plugin Name:     Event Tickets Extension: PDF Tickets
- * Description:     RSVP, WooCommerce, and Easy Digital Downloads will become PDFs (will be saved to your Uploads directory) and attached to the ticket email.
- * Version:         1.0.0
- * Extension Class: Tribe__Extension__PDF_Tickets
- * Author:          Modern Tribe, Inc.
- * Author URI:      http://m.tri.be/1971
- * License:         GPLv2 or later
- * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
+ * Plugin Name:       Event Tickets Extension: PDF Tickets
+ * Description:       RSVP, WooCommerce, and Easy Digital Downloads will become PDFs (will be saved to your Uploads directory) and attached to the ticket email.
+ * Version:           1.0.1
+ * Extension Class:   Tribe__Extension__PDF_Tickets
  * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
+ * Author:            Modern Tribe, Inc.
+ * Author URI:        http://m.tri.be/1971
+ * License:           GPL version 2
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tribe-ext-pdf-tickets
  */
 
-// Do not load unless Tribe Common is fully loaded.
-if ( ! class_exists( 'Tribe__Extension' ) ) {
-	return;
-}
-
+// Do not load unless Tribe Common is fully loaded and our class does not yet exist.
+if (
+	class_exists( 'Tribe__Extension' )
+	&& ! class_exists( 'Tribe__Extension__Example' )
+) {
 /**
  * Extension main class, class begins loading on init() function.
  */
@@ -105,16 +105,35 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * Permalink Settings admin screen and do not load the rest of this plugin.
 	 */
 	public function init() {
-		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
-			$message = '<p>' . $this->get_name();
 		// Load plugin textdomain
 		load_plugin_textdomain( 'tribe-ext-pdf-tickets', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 
-			$message .= __( ' requires PHP 5.6 or newer to work (as well as the `mbstring` and `gd` PHP extensions). Please contact your website host and inquire about updating PHP.', 'tribe-extension' );
+		/**
+		 * Protect against fatals by specifying the required minimum PHP
+		 * version. Make sure to match the readme.txt header.
+		 *
+		 * All extensions require PHP 5.3+.
+		 * 5.6: Variadic Functions, Argument Unpacking, and Constant Expressions
+		 *
+		 * @link https://secure.php.net/manual/en/migration56.new-features.php
+		 */
+		$php_required_version = '5.6';
 
-			$message .= '</p>';
+		if ( version_compare( PHP_VERSION, $php_required_version, '<' ) ) {
+			if (
+				is_admin()
+				&& current_user_can( 'activate_plugins' )
+			) {
+				$message = '<p>';
 
-			tribe_notice( $this->get_name(), $message, 'type=error' );
+				$message .= sprintf( __( '%s requires PHP version %s or newer to work (as well as the `mbstring` and `gd` PHP extensions). Please contact your website host and inquire about updating PHP.', 'tribe-ext-pdf-tickets' ), $this->get_name(), $php_required_version );
+
+				$message .= sprintf( ' <a href="%1$s">%1$s</a>', 'https://wordpress.org/about/requirements/' );
+
+				$message .= '</p>';
+
+				tribe_notice( $this->get_name(), $message, 'type=error' );
+			}
 
 			return;
 		}
@@ -936,4 +955,5 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		}
 	}
 
-}
+} // end class
+} // end if class_exists check

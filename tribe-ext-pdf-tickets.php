@@ -147,6 +147,9 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
 
+			// Event Tickets: Tribe PayPal
+			add_action( 'event_tickets_tpp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
 			// Event Tickets Plus: WooCommerce
 			add_action( 'event_ticket_woo_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
 
@@ -362,6 +365,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 			// cannot use 'post_type' => 'any' because these post types have `exclude_from_search` set to TRUE (because `public` is FALSE)
 			'post_type'      => array(
 				Tribe__Tickets__RSVP::ATTENDEE_OBJECT,
+				Tribe__Tickets__Commerce__PayPal__Main::ATTENDEE_OBJECT,
 				Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_OBJECT,
 				Tribe__Tickets_Plus__Commerce__EDD__Main::ATTENDEE_OBJECT,
 			),
@@ -664,6 +668,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			if ( 'Tribe__Tickets__RSVP' === $ticket_class ) {
 				add_filter( 'tribe_rsvp_email_attachments', array( $this, 'email_attach_pdf' ) );
+			} elseif ( 'Tribe__Tickets__Commerce__PayPal__Main' === $ticket_class ) {
+				add_filter( 'tribe_tpp_email_attachments', array( $this, 'email_attach_pdf', ) );
 			} elseif ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
 				add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf', ) );
 			} elseif ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $ticket_class ) {
@@ -690,8 +696,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	/**
 	 * Attach the queued PDF(s) to the ticket email.
 	 *
-	 * RSVP, Woo, and EDD filters all just pass an attachments array so we can
-	 * get away with a single, simple function here.
+	 * RSVP, Tribe PayPal, WooCommerce, and EDD filters all just pass an
+	 * attachments array so we can get away with a single, simple function here.
 	 *
 	 * @param $attachments
 	 *

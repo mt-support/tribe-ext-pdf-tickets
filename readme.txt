@@ -38,6 +38,10 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 == Changelog ==
 
+= 1.0.0 2018-05-12 =
+
+* Feature - Added support for Tribe Commerce PayPal tickets
+
 = 1.0.0 2017-12-06 =
 
 * Initial release

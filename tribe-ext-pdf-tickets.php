@@ -835,6 +835,23 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		// to avoid this fatal error: https://github.com/mpdf/mpdf/issues/524
 		$html = str_ireplace( ' !important', '', $html );
 
+		$mpdf_args = array(
+			'mode' => 'c', // Use only core system fonts. If you change this, such as to blank, you will need to add the missing "vendor/mpdf/**/ttfonts" directory, which got excluded via Composer.
+			'format' => 'LETTER', // Default is A4
+		);
+
+		/**
+		 * Filter the arguments with which to run mPDF.
+		 *
+		 * Reference vendor/mpdf/config.php, especially since it may not match
+		 * the documentation.
+		 *
+		 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html An outdated reference.
+		 *
+		 * @return array
+		 */
+		$mpdf_args = apply_filters( 'tribe_ext_pdf_tickets_mpdf_args', $mpdf_args );
+
 		/**
 		 * Creating and setting the PDF
 		 *
@@ -850,7 +867,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html
 		 * @link https://github.com/mpdf/mpdf/pull/490
 		 */
-		$mpdf = new \Mpdf\Mpdf( array( 'mode' => 'c' ) );
+		$mpdf = new \Mpdf\Mpdf( $mpdf_args );
 
 		$mpdf->WriteHTML( $html );
 

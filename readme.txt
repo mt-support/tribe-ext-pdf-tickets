@@ -41,6 +41,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 = 1.0.0 2018-05-12 =
 
 * Feature - Added support for Tribe Commerce PayPal tickets
+* Tweak - Update mPDF dependency from version 7.0.0 to version 7.0.3
 
 = 1.0.0 2017-12-06 =
 

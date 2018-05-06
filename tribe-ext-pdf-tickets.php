@@ -719,8 +719,16 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 *
 	 * @return string
 	 */
-	protected function ticket_link( $attendee_id ) {
+	public function ticket_link( $attendee_id ) {
 		$text = __( 'PDF Ticket', 'tribe-ext-pdf-tickets' );
+
+		/**
+		 * Filter to customize the ticket link's anchor text.
+		 *
+		 * @param $anchor_text
+		 * @param $attendee_id
+		 */
+		$text = apply_filters( 'tribe_ext_pdf_tickets_anchor_text', $text, $attendee_id );
 
 		/**
 		 * Filter to control the link target for Attendees Report links.

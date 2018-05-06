@@ -848,7 +848,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html An outdated reference.
 		 *
-		 * @return array
+		 * @param array $mpdf_args
 		 */
 		$mpdf_args = apply_filters( 'tribe_ext_pdf_tickets_mpdf_args', $mpdf_args );
 

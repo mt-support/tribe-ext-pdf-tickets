@@ -388,12 +388,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	private function get_attendee_id_from_unique_id( $unique_id ) {
 		$args = array(
 			// cannot use 'post_type' => 'any' because these post types have `exclude_from_search` set to TRUE (because `public` is FALSE)
-			'post_type'      => array(
-				Tribe__Tickets__RSVP::ATTENDEE_OBJECT,
-				Tribe__Tickets__Commerce__PayPal__Main::ATTENDEE_OBJECT,
-				Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_OBJECT,
-				Tribe__Tickets_Plus__Commerce__EDD__Main::ATTENDEE_OBJECT,
-			),
+			'post_type'      => $this->active_attendee_post_type_keys,
 			'nopaging'       => true,
 			'posts_per_page' => 1,
 			'fields'         => 'ids',

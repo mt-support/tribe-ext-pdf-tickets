@@ -58,6 +58,15 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	protected $attachments_array = array();
 
 	/**
+	 * Active attendee post type keys.
+	 *
+	 * Not the same as the ticket post type keys.
+	 *
+	 * @var array
+	 */
+	protected $active_attendee_post_type_keys = array();
+
+	/**
 	 * Setup the Extension's properties.
 	 *
 	 * This always executes even if the required plugins are not present.
@@ -93,6 +102,20 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 				$this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.4.3' );
 			}
 
+		}
+	}
+
+	/**
+	 * Build the array of active ticket types' post type keys.
+	 *
+	 * @see Tribe__Tickets__Tickets::modules()
+	 * @see Tribe__Extension__PDF_Tickets::$active_attendee_post_type_keys
+	 */
+	private function build_active_ticket_post_type_keys() {
+		$active_modules = Tribe__Tickets__Tickets::modules();
+
+		foreach( $active_modules as $class => $name ) {
+			$this->active_attendee_post_type_keys[ $name ] = $class::ATTENDEE_OBJECT;
 		}
 	}
 
@@ -137,6 +160,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			return;
 		}
+
+		$this->build_active_ticket_post_type_keys();
 
 		$permalink_structure = get_option( 'permalink_structure' );
 		if ( ! empty( $permalink_structure ) ) {

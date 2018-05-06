@@ -728,6 +728,58 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	}
 
 	/**
+	 * Delete all an event's PDF Ticket files from the server.
+	 *
+	 * TRUE if the event does not have any tickets, does not have any attendees,
+	 * or all the PDFs just got successfully deleted. Otherwise, FALSE (i.e. one
+	 * or more PDF Ticket files for this event still exist on the server).
+	 *
+	 * @param int $event_id Post ID of a post type that has tickets enabled.
+	 *
+	 * @return bool
+	 */
+	public function delete_all_tickets_for_event( $event_id = 0 ) {
+		$sucessful = true;
+
+		if ( tribe_events_has_tickets( $event_id ) ) {
+			$attendee_ids = Tribe__Tickets__Data_API::get_attendees_by_id( $event_id );
+
+			if ( 0 < count( $attendee_ids ) ) {
+				$success_array = array();
+
+				foreach ( $attendee_ids as $attendee_id ) {
+					$success_array[] = $this->delete_single_pdf_ticket( $attendee_id );
+				}
+
+				$sucessful = ! in_array( false, $success_array );
+			}
+		}
+
+		return $sucessful;
+	}
+
+	/**
+	 * Delete a single attendee's PDF Ticket file from the server.
+	 *
+	 * If, at the end of this method's logic, the file does not exist (either
+	 * because it did not before or because it just got deleted), then return
+	 * TRUE, else FALSE (i.e. it still does exist).
+	 *
+	 * @param int $attendee_id
+	 *
+	 * @return bool
+	 */
+	public function delete_single_pdf_ticket( $attendee_id = 0 ) {
+		$file_name = $this->get_pdf_path( $attendee_id );
+
+		if ( file_exists( $file_name ) ) {
+			unlink( $file_name );
+		}
+
+		return ! file_exists( $file_name );
+	}
+
+	/**
 	 * Attach the queued PDF(s) to the ticket email.
 	 *
 	 * RSVP, Tribe PayPal, WooCommerce, and EDD filters all just pass an

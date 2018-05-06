@@ -435,7 +435,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 *
 	 * @return string
 	 */
-	private function get_pdf_link( $attendee_id ) {
+	public function get_pdf_link( $attendee_id ) {
 		$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
 
 		$url = home_url( '/' ) . $this->get_download_base_slug();

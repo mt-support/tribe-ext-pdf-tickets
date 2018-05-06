@@ -596,6 +596,23 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	}
 
 	/**
+	 * Given an Attendee ID, get the ticket type's instance.
+	 *
+	 * @see tribe()
+	 *
+	 * @param int $attendee_id
+	 *
+	 * @return mixed
+	 */
+	private function get_attendees_ticket_instance( $attendee_id = 0 ) {
+		$ticket_provider_data = tribe_tickets_get_ticket_provider( $attendee_id );
+
+		$ticket_class = $ticket_provider_data->className;
+
+		return $ticket_class::get_instance();
+	}
+
+	/**
 	 * Create PDF, save to server, and add to email queue.
 	 *
 	 * @param      $attendee_id ID of attendee ticket.
@@ -606,9 +623,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	public function do_upload_pdf( $attendee_id, $email = true ) {
 		$successful = false;
 
-		$ticket_provider_data = tribe_tickets_get_ticket_provider( $attendee_id );
-		$ticket_class         = $ticket_provider_data->className;
-		$ticket_instance      = $ticket_class::get_instance();
+		$ticket_instance = $this->get_attendees_ticket_instance( $attendee_id );
 
 		if ( empty( $ticket_instance ) ) {
 			return $successful;

@@ -472,6 +472,11 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * @return string
 	 */
 	protected function get_file_rewrite_regex() {
+		// required by $this->get_download_base_slug()
+		if ( ! class_exists( 'Tribe__Tickets__Tickets_View' ) ) {
+			return '';
+		}
+
 		$regex_for_file = sprintf( '^%s/(%s)[/]?$', $this->get_download_base_slug(), $this->get_unique_id_regex() );
 
 		return $regex_for_file;
@@ -554,7 +559,11 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 			return;
 		}
 
-		if ( ! array_key_exists( $this->get_file_rewrite_regex(), $rewrite_rules ) ) {
+		$file_rewrite_regex = $this->get_file_rewrite_regex();
+		if (
+			! empty( $file_rewrite_regex )
+			&& ! array_key_exists( $file_rewrite_regex, $rewrite_rules )
+		) {
 			$this->add_pdf_file_rewrite_rules();
 
 			flush_rewrite_rules();

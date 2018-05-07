@@ -47,6 +47,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 * Tweak - Changed mPDF arguments to default to letter-size (8.5 x 11 inches) instead of its default A4 (8.27 x 11.69 inches)
 * Fix - Protect against fatal triggered when Event Tickets plugin got deactivated while this extension was still active
 * Fix - Add additional action hooks for when a ticket is modified and then force regenerating the PDF so it always matches the HTML/email version
+* Fix - Corrected text domain and load text domain to make this extension plugin translatable
 
 = 1.0.0 2017-12-06 =
 

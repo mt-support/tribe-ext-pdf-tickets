@@ -841,8 +841,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		$sucessful = true;
 
 		if ( tribe_events_has_tickets( $event_id ) ) {
-			$tickets_data_api = new Tribe__Tickets__Data_API();
-			$attendees = (array) $tickets_data_api->get_attendees_by_id( $event_id );
+			$attendees = (array) tribe_tickets_get_attendees( $event_id );
 
 			$attendee_ids = wp_list_pluck( $attendees, 'attendee_id' );
 

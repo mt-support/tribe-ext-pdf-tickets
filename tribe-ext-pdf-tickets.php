@@ -223,7 +223,6 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			tribe_notice( $this->get_name(), $message, 'type=error' );
 		}
-
 	}
 
 	/**
@@ -381,6 +380,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	}
 
 	/**
+	 * Get the Attendee ID from the Unique ID postmeta value.
+	 *
 	 * @param $unique_id
 	 *
 	 * @return int
@@ -593,6 +594,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	/**
 	 * Given an Attendee ID, get the ticket type's instance.
 	 *
+	 * @since 1.0.1
+	 *
 	 * @see tribe()
 	 *
 	 * @param int $attendee_id
@@ -744,6 +747,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * Used to iterate over all the files, such as deleting all. Note that
 	 * sorting is not applied.
 	 *
+	 * @since 1.0.1
+	 *
 	 * @link https://secure.php.net/manual/class.directoryiterator.php
 	 * @link https://secure.php.net/manual/function.glob.php Running with GLOB_NOSORT has comparable speed but is not as flexible.
 	 *
@@ -778,6 +783,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * After trying to delete all found files, returns TRUE if there are no more
 	 * found files, else FALSE (i.e. one or more files matching the pattern
 	 * still exists).
+	 *
+	 * @since 1.0.1
 	 *
 	 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
 	 * @link https://secure.php.net/manual/function.unlink.php
@@ -819,6 +826,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * or all the PDFs just got successfully deleted. Otherwise, FALSE (i.e. one
 	 * or more PDF Ticket files for this event still exist on the server).
 	 *
+	 * @since 1.0.1
+	 *
 	 * @param int $event_id Post ID of a post type that has tickets enabled.
 	 *
 	 * @return bool
@@ -849,6 +858,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * If, at the end of this method's logic, the file does not exist (either
 	 * because it did not before or because it just got deleted), then return
 	 * TRUE, else FALSE (i.e. it still does exist).
+	 *
+	 * @since 1.0.1
 	 *
 	 * @param int $attendee_id
 	 *

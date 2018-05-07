@@ -15,8 +15,7 @@ Brief description of the extension.
 
 This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+For backwards compatibility, if this section is missing, the full length of the short description will be used, and Markdown parsed.
 
 == Installation ==
 
@@ -42,10 +41,12 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 * Feature - Added support for Tribe Commerce PayPal tickets
 * Feature - Added new public methods: `delete_all_tickets_for_event()`, `delete_all_tickets_for_event()`, `delete_single_pdf_ticket()`
+* Tweak - To be more extensible, made these methods public: `ticket_link()`, `get_pdf_link()`, `get_direct_pdf_url()`, `get_pdf_path()`
+* Tweak - Added new `tribe_ext_pdf_tickets_mpdf_args` filter to customize the arguments sent to [mPDF](https://github.com/mpdf/mpdf)
 * Tweak - Update mPDF dependency from version 7.0.0 to version 7.0.3
 * Tweak - Changed mPDF arguments to default to letter-size (8.5 x 11 inches) instead of its default A4 (8.27 x 11.69 inches)
-* Tweak - Added new `tribe_ext_pdf_tickets_mpdf_args` filter to customize the arguments sent to mPDF
-* Fix - Protect against fatal triggered when Event Tickets plugin gets deactivated
+* Fix - Protect against fatal triggered when Event Tickets plugin got deactivated while this extension was still active
+* Fix - Add additional action hooks for when a ticket is modified and then force regenerating the PDF so it always matches the HTML/email version
 
 = 1.0.0 2017-12-06 =
 

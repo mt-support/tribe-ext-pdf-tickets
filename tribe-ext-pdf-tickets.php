@@ -170,6 +170,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 2 );
 
+			// do_upload_pdf() when tickets are created
 			add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
 
 			// Event Tickets: Tribe PayPal
@@ -180,6 +181,17 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 
 			// Event Tickets Plus: Easy Digital Downloads
 			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
+			// After modifying an Attendee, delete its PDF Ticket file so it is no longer outdated.
+			foreach ( $this->active_attendee_post_type_keys as $active_attendee_post_type_keys ) {
+				add_action( 'save_post_' . $active_attendee_post_type_keys, array( $this, 'process_updated_attendee' ), 50, 3 );
+			}
+
+			// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.
+			$post_types_tickets_enabled = (array) tribe_get_option( 'ticket-enabled-post-types', array() );
+			foreach ( $post_types_tickets_enabled as $post_type ) {
+				add_action( 'save_post_' . $post_type, array( $this, 'process_updated_event' ), 50, 3 );
+			}
 
 			// Add rewrite rules
 			add_action( 'init', array( $this, 'add_pdf_file_rewrite_rules' ) );
@@ -803,6 +815,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		 * happens, such as moving to a different directory (backup) or
 		 * renaming both of which would protect the files from being deleted.
 		 *
+		 * @since 1.0.1
+		 *
 		 * @param array  $found_files
 		 * @param string $match_pattern
 		 */
@@ -836,7 +850,10 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		$sucessful = true;
 
 		if ( tribe_events_has_tickets( $event_id ) ) {
-			$attendee_ids = Tribe__Tickets__Data_API::get_attendees_by_id( $event_id );
+			$tickets_data_api = new Tribe__Tickets__Data_API();
+			$attendees = (array) $tickets_data_api->get_attendees_by_id( $event_id );
+
+			$attendee_ids = wp_list_pluck( $attendees, 'attendee_id' );
 
 			if ( 0 < count( $attendee_ids ) ) {
 				$success_array = array();
@@ -872,7 +889,128 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 			unlink( $file_name );
 		}
 
-		return ! file_exists( $file_name );
+		$result = ! file_exists( $file_name );
+
+		/**
+		 * Action fired after attempting to delete a single PDF Ticket file.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param bool $result      Whether or not the PDF Ticket file was
+		 *                          successfully deleted.
+		 * @param int  $attendee_id
+		 */
+		do_action( 'tribe_ext_pdf_tickets_after_delete_single_pdf_ticket', $result, $attendee_id );
+
+		return $result;
+	}
+
+	/**
+	 * Upon updating an Attendee, delete its PDF Ticket file.
+	 *
+	 * We do not regenerate the PDF Ticket file because that will happen
+	 * automatically if/when each PDF Ticket link is clicked in the future.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
+	 *
+	 * @param int     $attendee_id
+	 * @param WP_Post $post
+	 * @param bool    $update
+	 *
+	 * @return bool
+	 */
+	public function process_updated_attendee( $attendee_id, $post, $update ) {
+		$is_autosave = ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ? true : false;
+		$is_revision = wp_is_post_revision( $attendee_id );
+
+		if (
+			empty( $update )
+			|| $is_autosave
+			|| $is_revision
+		) {
+			return false;
+		}
+
+		/**
+		 * Filter to control whether or not an Attendee's PDF Ticket file gets
+		 * deleted automatically upon being updated.
+		 *
+		 * Useful if you want to prevent the overhead of deleting a file, such
+		 * as only wanting to delete if a certain piece of information changes.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param bool    $bail        Set to TRUE to avoid deleting this
+		 *                             Attendee's PDF Ticket file.
+		 * @param int     $attendee_id
+		 * @param WP_Post $post
+		 * @param bool    $update
+		 */
+		$bail = apply_filters( 'tribe_ext_pdf_tickets_process_updated_attendee', false, $attendee_id, $post, $update );
+
+		if ( true === $bail ) {
+			return false;
+		} else {
+			return $this->delete_single_pdf_ticket( $attendee_id );
+		}
+	}
+
+	/**
+	 * Upon updating an Event (any post type with tickets), delete all of its
+	 * PDF Ticket files so they are not outdated.
+	 *
+	 * We do not regenerate the PDF Ticket files because that will happen
+	 * automatically if/when each PDF Ticket link is clicked in the future.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
+	 *
+	 * @param int     $event_id Applies to all Post Types, not just Tribe Events.
+	 * @param WP_Post $post
+	 * @param bool    $update
+	 *
+	 * @return bool
+	 */
+	public function process_updated_event( $event_id, $post, $update ) {
+		$is_autosave = ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ? true : false;
+		$is_revision = wp_is_post_revision( $event_id );
+
+		if (
+			empty( $update )
+			|| $is_autosave
+			|| $is_revision
+		) {
+			return false;
+		}
+
+		/**
+		 * Filter to control whether or not an Event's PDF Ticket files get
+		 * deleted automatically when the event (any post type) is updated.
+		 *
+		 * Useful if you want to prevent the overhead of deleting files, such
+		 * as only wanting to delete if a specific piece of information got
+		 * changed. For example, if your email HTML does not include the Venue
+		 * information, you may not want to deleted all the PDFs if only the
+		 * Venue changed.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param bool    $bail        Set to TRUE to avoid deleting this
+		 *                             Attendee's PDF Ticket file.
+		 * @param int     $event_id
+		 * @param WP_Post $post
+		 * @param bool    $update
+		 */
+		$bail = apply_filters( 'tribe_ext_pdf_tickets_process_updated_event', false, $event_id, $post, $update );
+
+		if ( true === $bail ) {
+			return false;
+		} else {
+			return $this->delete_all_tickets_for_event( $event_id );
+		}
 	}
 
 	/**

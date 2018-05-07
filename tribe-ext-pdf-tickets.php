@@ -436,14 +436,13 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * Get the true full URL to the PDF file, including ".pdf" at the end.
 	 *
 	 * Example result: http://example.com/wp-content/uploads/tribe_tickets_{unique_id}.pdf
+	 * Not used internally but may be useful when extending this plugin.
 	 *
-	 * @param $attendee_id
+	 * @param int $attendee_id
 	 *
 	 * @return string
 	 */
-	private function get_direct_pdf_url( $unique_id ) {
-		$attendee_id = $this->get_attendee_id_from_unique_id( $unique_id );
-
+	public function get_direct_pdf_url( $attendee_id = 0 ) {
 		$file_url = $this->uploads_directory_url() . $this->get_pdf_name( $attendee_id );
 
 		return esc_url( $file_url );

@@ -41,6 +41,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 * Feature - Added support for Tribe Commerce PayPal tickets
 * Feature - Added new public methods: `delete_all_tickets_for_event()`, `delete_all_tickets_for_event()`, `delete_single_pdf_ticket()`
+* Tweak - Delete PDF files from server whenever they are detected to be outdated, such as when an Event is updated, an Attendee's Additional Information is updated, or a Venue or Organizer is updated -- added multiple hooks to disable deleting upon these triggers
 * Tweak - To be more extensible, made these methods public: `ticket_link()`, `get_pdf_link()`, `get_direct_pdf_url()`, `get_pdf_path()`
 * Tweak - Added new `tribe_ext_pdf_tickets_mpdf_args` filter to customize the arguments sent to [mPDF](https://github.com/mpdf/mpdf)
 * Tweak - Update mPDF dependency from version 7.0.0 to version 7.0.3

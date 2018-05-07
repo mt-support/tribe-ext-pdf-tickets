@@ -170,28 +170,8 @@ if (
 
 				add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 2 );
 
-				// do_upload_pdf() when tickets are created
-				add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
 
-				// Event Tickets: Tribe PayPal
-				add_action( 'event_tickets_tpp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
-
-				// Event Tickets Plus: WooCommerce
-				add_action( 'event_ticket_woo_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
-
-				// Event Tickets Plus: Easy Digital Downloads
-				add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
-
-				// After modifying an Attendee, delete its PDF Ticket file so it is no longer outdated.
-				foreach ( $this->active_attendee_post_type_keys as $active_attendee_post_type_keys ) {
-					add_action( 'save_post_' . $active_attendee_post_type_keys, array( $this, 'process_updated_attendee' ), 50, 3 );
-				}
-
-				// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.
-				$post_types_tickets_enabled = (array) Tribe__Tickets__Main::instance()->post_types();
-				foreach ( $post_types_tickets_enabled as $post_type ) {
-					add_action( 'save_post_' . $post_type, array( $this, 'process_updated_event' ), 50, 3 );
-				}
+				add_action( 'init', array( $this, 'create_pdf_file_creation_deletion_triggers' ), 50 );
 
 				// Add rewrite rules
 				add_action( 'init', array( $this, 'add_pdf_file_rewrite_rules' ) );
@@ -234,6 +214,48 @@ if (
 				}
 
 				tribe_notice( $this->get_name(), $message, 'type=error' );
+			}
+		}
+
+		/**
+		 * Setup the hooks needed to trigger PDF Ticket file creation and
+		 * deletion when appropriate.
+		 *
+		 * Cannot run in $this->init() because that is too early to run
+		 * tribe_get_linked_post_types().
+		 */
+		public function create_pdf_file_creation_deletion_triggers() {
+			// do_upload_pdf() when tickets are created
+			add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
+			// Event Tickets: Tribe PayPal
+			add_action( 'event_tickets_tpp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
+			// Event Tickets Plus: WooCommerce
+			add_action( 'event_ticket_woo_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
+			// Event Tickets Plus: Easy Digital Downloads
+			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+
+			// After modifying Attendee Information (e.g. self-service), delete its PDF Ticket file so it is no longer outdated.
+			add_action( 'updated_postmeta', array( $this, 'process_updated_post_meta' ), 50, 4 );
+
+			// After modifying an Attendee, delete its PDF Ticket file so it is no longer outdated. Not sure when it might be triggered but it's here for completeness.
+			foreach ( $this->active_attendee_post_type_keys as $active_attendee_post_type_keys ) {
+				add_action( 'save_post_' . $active_attendee_post_type_keys, array( $this, 'process_updated_attendee' ), 50, 3 );
+			}
+
+			// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.
+			$post_types_tickets_enabled = (array) Tribe__Tickets__Main::instance()->post_types();
+			foreach ( $post_types_tickets_enabled as $post_type ) {
+				add_action( 'save_post_' . $post_type, array( $this, 'process_updated_event' ), 50, 3 );
+			}
+
+			// Tribe Events Linked Post Types
+			if ( function_exists( 'tribe_get_linked_post_types' ) ) {
+				foreach ( tribe_get_linked_post_types() as $linked_post_type => $value ) {
+					add_action( 'save_post_' . $linked_post_type, array( $this, 'process_updated_tribe_event_linked_post_type' ), 50, 3 );
+				}
 			}
 		}
 
@@ -902,6 +924,55 @@ if (
 		 *
 		 * @since 1.0.1
 		 *
+		 * @link https://developer.wordpress.org/reference/hooks/updated_postmeta/
+		 *
+		 * @see Tribe__Tickets_Plus__Meta::META_KEY
+		 *
+		 * @param int    $meta_id
+		 * @param int    $object_id
+		 * @param string $meta_key
+		 * @param mixed  $meta_value
+		 *
+		 * @return bool
+		 */
+		public function process_updated_post_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
+			if (
+				Tribe__Tickets_Plus__Meta::META_KEY !== $meta_key
+			) {
+				return false;
+			}
+
+			/**
+			 * Filter to control whether or not an Attendee's PDF Ticket file
+			 * gets deleted automatically upon the Attendee Information being
+			 * updated.
+			 *
+			 * @since 1.0.1
+			 *
+			 * @param bool   $bail       Set to TRUE to avoid deleting this
+			 *                           Attendee's PDF Ticket file.
+			 * @param int    $meta_id
+			 * @param int    $object_id
+			 * @param string $meta_key
+			 * @param mixed  $meta_value
+			 */
+			$bail = apply_filters( 'tribe_ext_pdf_tickets_process_updated_post_meta', false, $meta_id, $object_id, $meta_key, $meta_value );
+
+			if ( true === $bail ) {
+				return false;
+			} else {
+				return $this->delete_single_pdf_ticket( $object_id );
+			}
+		}
+
+		/**
+		 * Upon updating an Attendee, delete its PDF Ticket file.
+		 *
+		 * We do not regenerate the PDF Ticket file because that will happen
+		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 *
+		 * @since 1.0.1
+		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
 		 * @param int $attendee_id
@@ -979,11 +1050,9 @@ if (
 			 * Filter to control whether or not an Event's PDF Ticket files get
 			 * deleted automatically when the event (any post type) is updated.
 			 *
-			 * Useful if you want to prevent the overhead of deleting files, such
-			 * as only wanting to delete if a specific piece of information got
-			 * changed. For example, if your email HTML does not include the Venue
-			 * information, you may not want to deleted all the PDFs if only the
-			 * Venue changed.
+			 * Useful if you want to prevent the overhead of deleting files,
+			 * such as only wanting to delete if a specific piece of information
+			 * (that is not displayed in your email template) got changed.
 			 *
 			 * @since 1.0.1
 			 *
@@ -1000,6 +1069,81 @@ if (
 			} else {
 				return $this->delete_all_tickets_for_event( $event_id );
 			}
+		}
+		/**
+		 * Upon updating a Tribe Event's Linked Post Type (e.g. Organizers,
+		 * Venues), delete all of its attached Event Post Type's PDF Ticket
+		 * files so they are not outdated.
+		 *
+		 * We do not regenerate the PDF Ticket files because that will happen
+		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
+		 *
+		 * @param int $linked_post_type_post_id Applies to all of Tribe Events'
+		 *                                      Linked Post Types.
+		 * @param WP_Post $post
+		 * @param bool $update
+		 *
+		 * @return bool
+		 */
+		public function process_updated_tribe_event_linked_post_type( $linked_post_type_post_id, $post, $update ) {
+			$is_autosave = ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ? true : false;
+			$is_revision = wp_is_post_revision( $linked_post_type_post_id );
+
+			if (
+				empty( $update )
+				|| $is_autosave
+				|| $is_revision
+				|| ! function_exists( 'tribe_get_linked_posts_by_post_type' )
+			) {
+				return false;
+			}
+
+			$linked_post_type = $post->post_type;
+
+			$linked_events = tribe_get_linked_posts_by_post_type( $linked_post_type_post_id, Tribe__Events__Main::POSTTYPE );
+
+			$event_ids = wp_list_pluck( $linked_events, 'ID' );
+
+			$success_array = array();
+
+			foreach ( $event_ids as $event_id ) {
+				/**
+				 * Filter to control whether or not an Event's PDF Ticket files
+				 * get deleted automatically when any of a Tribe Event's Linked
+				 * Post Type is updated.
+				 *
+				 * Useful if you want to prevent the overhead of deleting files, such
+				 * as only wanting to delete if a specific piece of information got
+				 * changed. For example, if your email HTML does not include the Venue
+				 * information, you may not want to delete all the PDFs if only the
+				 * Venue changed.
+				 *
+				 * @since 1.0.1
+				 *
+				 * @param bool $bail                    Set to TRUE to avoid deleting
+				 *                                      this Event's PDF Ticket files.
+				 * @param string $linked_post_type      Post Type (e.g. tribe_venue)
+				 * @param int $linked_post_type_post_id
+				 * @param int $event_id                 Tribe Event post type ID
+				 * @param WP_Post $post
+				 * @param bool $update
+				 */
+				$bail = apply_filters( 'tribe_ext_pdf_tickets_process_updated_event', false, $linked_post_type, $linked_post_type_post_id, $event_id, $post, $update );
+
+				if ( true === $bail ) {
+					$success_array[] = false;
+				} else {
+					$success_array[] = $this->delete_all_tickets_for_event( $event_id );
+				}
+			}
+
+			$sucessful = ! in_array( false, $success_array );
+
+			return $sucessful;
 		}
 
 		/**

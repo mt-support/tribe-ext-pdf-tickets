@@ -738,6 +738,42 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	}
 
 	/**
+	 * Delete ALL of the PDF Ticket files from the upload directory, based on
+	 * file name pattern matching.
+	 *
+	 * After trying to delete all found files, returns TRUE if there are no more
+	 * found files, else FALSE (i.e. one or more files matching the pattern
+	 * still exists).
+	 *
+	 * @link https://secure.php.net/manual/class.directoryiterator.php
+	 * @link https://secure.php.net/manual/function.glob.php Running with GLOB_NOSORT is barely slower.
+	 * @link https://secure.php.net/manual/en/function.clearstatcache.php unlink() clears the file status cache automatically.
+	 *
+	 * @return bool
+	 */
+	public function delete_all_pdf_tickets() {
+		$match_pattern = sprintf( '%s%s*.pdf', $this->uploads_directory_path(), $this->get_file_name_prefix() );
+
+		$found_files = glob( $match_pattern, GLOB_NOSORT );
+
+		/**
+		 * Action hook that fires before running Delete All PDF Ticket files.
+		 *
+		 * May be useful if you want to do your own iteration.
+		 *
+		 * @param array  $found_files
+		 * @param string $match_pattern
+		 */
+		do_action( 'tribe_ext_pdf_tickets_before_delete_all_pdf_ticket_files', $found_files, $match_pattern );
+
+		array_map( 'unlink', $found_files );
+
+		$found_files = glob( $match_pattern, GLOB_NOSORT );
+
+		return empty( $found_files );
+	}
+
+	/**
 	 * Delete all an event's PDF Ticket files from the server.
 	 *
 	 * TRUE if the event does not have any tickets, does not have any attendees,

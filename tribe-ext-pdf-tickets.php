@@ -364,6 +364,14 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 * @return string
 	 */
 	private function get_unique_id_from_attendee_id( $attendee_id ) {
+		// We need to short circuit here because if we are accidentally passing a non-integer, for example, a new $unique_id will get generated, which is misleading.
+		if (
+			! is_int( $attendee_id )
+			|| 0 === absint( $attendee_id )
+		) {
+			throw new Exception( 'You did not pass a valid $attendee_id to Tribe__Extension__PDF_Tickets::get_unique_id_from_attendee_id()' );
+		}
+
 		$unique_id = get_post_meta( $attendee_id, $this->pdf_ticket_meta_key, true );
 
 		if ( empty( $unique_id ) ) {

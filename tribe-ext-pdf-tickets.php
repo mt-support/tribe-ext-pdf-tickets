@@ -337,7 +337,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	 *
 	 * @return string
 	 */
-	private function get_pdf_path( $attendee_id ) {
+	public function get_pdf_path( $attendee_id ) {
 		return $this->uploads_directory_path() . $this->get_pdf_name( $attendee_id );
 	}
 

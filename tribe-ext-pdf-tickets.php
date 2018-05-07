@@ -686,10 +686,10 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		}
 
 		/**
-		 * Action hook after the PDF ticket gets created.
+		 * Action hook after the PDF Ticket file gets created.
 		 *
-		 * Might be useful if you want the PDF file added to the Media Library
-		 * via wp_insert_attachment(), for example.
+		 * Might be useful if you want the PDF Ticket file added to the
+		 * Media Library via wp_insert_attachment(), for example.
 		 *
 		 * @param $ticket_class
 		 * @param $event_id
@@ -1033,7 +1033,10 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		$text = __( 'PDF Ticket', 'tribe-ext-pdf-tickets' );
 
 		/**
-		 * Filter to customize the ticket link's anchor text.
+		 * Filter to customize the ticket link's anchor text, such as to add
+		 * the Attendee ID to the anchor text.
+		 *
+		 * @since 1.0.1
 		 *
 		 * @param $anchor_text
 		 * @param $attendee_id
@@ -1163,6 +1166,8 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 		 *
 		 * Reference vendor/mpdf/config.php, especially since it may not match
 		 * the documentation.
+		 *
+		 * @since 1.0.1
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html An outdated reference.
 		 *

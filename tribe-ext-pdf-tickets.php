@@ -738,37 +738,76 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 	}
 
 	/**
-	 * Delete ALL of the PDF Ticket files from the upload directory, based on
-	 * file name pattern matching.
+	 * Find all the PDF files in the Uploads directory that match our naming
+	 * convention.
+	 *
+	 * Used to iterate over all the files, such as deleting all. Note that
+	 * sorting is not applied.
+	 *
+	 * @link https://secure.php.net/manual/class.directoryiterator.php
+	 * @link https://secure.php.net/manual/function.glob.php Running with GLOB_NOSORT has comparable speed but is not as flexible.
+	 *
+	 * @see Tribe__Extension__PDF_Tickets::uploads_directory_path()
+	 *
+	 * @return array
+	 */
+	public function find_all_pdf_ticket_files() {
+		$uploads_dir = $this->uploads_directory_path();
+
+		$file_name_prefix = $this->get_file_name_prefix();
+		$file_name_prefix_length = strlen( $file_name_prefix );
+
+		$found_files = array();
+
+		foreach( new DirectoryIterator( $uploads_dir ) as $file_info ) {
+			if (
+				$file_info->isFile()
+				&& 'pdf' === strtolower( $file_info->getExtension() )
+				&& $file_name_prefix === substr( $file_info->getFilename(), 0, $file_name_prefix_length )
+			) {
+				$found_files[] = $uploads_dir . $file_info->getFilename();
+			}
+		}
+
+		return $found_files;
+	}
+
+	/**
+	 * Delete ALL of the PDF Ticket files from the upload directory.
 	 *
 	 * After trying to delete all found files, returns TRUE if there are no more
 	 * found files, else FALSE (i.e. one or more files matching the pattern
 	 * still exists).
 	 *
-	 * @link https://secure.php.net/manual/class.directoryiterator.php
-	 * @link https://secure.php.net/manual/function.glob.php Running with GLOB_NOSORT is barely slower.
-	 * @link https://secure.php.net/manual/en/function.clearstatcache.php unlink() clears the file status cache automatically.
+	 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
+	 * @link https://secure.php.net/manual/function.unlink.php
+	 *
+	 * @see Tribe__Extension__PDF_Tickets::find_all_pdf_ticket_files()
 	 *
 	 * @return bool
 	 */
 	public function delete_all_pdf_tickets() {
-		$match_pattern = sprintf( '%s%s*.pdf', $this->uploads_directory_path(), $this->get_file_name_prefix() );
-
-		$found_files = glob( $match_pattern, GLOB_NOSORT );
+		$found_files = $this->find_all_pdf_ticket_files();
 
 		/**
 		 * Action hook that fires before running Delete All PDF Ticket files.
 		 *
-		 * May be useful if you want to do your own iteration.
+		 * May be useful if you want to do your own iteration before deletion
+		 * happens, such as moving to a different directory (backup) or
+		 * renaming both of which would protect the files from being deleted.
 		 *
 		 * @param array  $found_files
 		 * @param string $match_pattern
 		 */
-		do_action( 'tribe_ext_pdf_tickets_before_delete_all_pdf_ticket_files', $found_files, $match_pattern );
+		do_action( 'tribe_ext_pdf_tickets_before_delete_all_pdf_ticket_files', $found_files );
 
-		array_map( 'unlink', $found_files );
+		foreach ( $found_files as $file ) {
+			if ( ! @unlink( $file ) ) {
+				throw new Exception( sprintf( '%s: Unable to delete file: %s', $this->get_name(), $file ) );
+			}
+		}
 
-		$found_files = glob( $match_pattern, GLOB_NOSORT );
+		$found_files = $this->find_all_pdf_ticket_files();
 
 		return empty( $found_files );
 	}

@@ -41,6 +41,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 = 1.0.1 2018-05-12 =
 
 * Feature - Added support for Tribe Commerce PayPal tickets
+* Feature - Added new public methods: `delete_all_tickets_for_event()`, `delete_all_tickets_for_event()`, `delete_single_pdf_ticket()`
 * Tweak - Update mPDF dependency from version 7.0.0 to version 7.0.3
 * Tweak - Changed mPDF arguments to default to letter-size (8.5 x 11 inches) instead of its default A4 (8.27 x 11.69 inches)
 * Tweak - Added new `tribe_ext_pdf_tickets_mpdf_args` filter to customize the arguments sent to mPDF

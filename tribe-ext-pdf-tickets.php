@@ -188,7 +188,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
 			}
 
 			// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.
-			$post_types_tickets_enabled = (array) tribe_get_option( 'ticket-enabled-post-types', array() );
+			$post_types_tickets_enabled = (array) Tribe__Tickets__Main::instance()->post_types();
 			foreach ( $post_types_tickets_enabled as $post_type ) {
 				add_action( 'save_post_' . $post_type, array( $this, 'process_updated_event' ), 50, 3 );
 			}

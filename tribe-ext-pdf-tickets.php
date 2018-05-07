@@ -166,15 +166,9 @@ if (
 			$permalink_structure = get_option( 'permalink_structure' );
 			if ( ! empty( $permalink_structure ) ) {
 				// Event Tickets
-				add_filter( 'event_tickets_attendees_table_row_actions', array(
-					$this,
-					'pdf_attendee_table_row_actions'
-				), 0, 2 );
+				add_filter( 'event_tickets_attendees_table_row_actions', array( $this, 'pdf_attendee_table_row_actions' ), 0, 2 );
 
-				add_action( 'event_tickets_orders_attendee_contents', array(
-					$this,
-					'pdf_attendee_table_row_action_contents'
-				), 10, 2 );
+				add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 2 );
 
 				// do_upload_pdf() when tickets are created
 				add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
@@ -190,10 +184,7 @@ if (
 
 				// After modifying an Attendee, delete its PDF Ticket file so it is no longer outdated.
 				foreach ( $this->active_attendee_post_type_keys as $active_attendee_post_type_keys ) {
-					add_action( 'save_post_' . $active_attendee_post_type_keys, array(
-						$this,
-						'process_updated_attendee'
-					), 50, 3 );
+					add_action( 'save_post_' . $active_attendee_post_type_keys, array( $this, 'process_updated_attendee' ), 50, 3 );
 				}
 
 				// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.

@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Event Tickets Extension: PDF Tickets
  * Description:       RSVP, Tribe Commerce PayPal, WooCommerce, and Easy Digital Downloads tickets will become PDFs (will be saved to your Uploads directory) and attached to the ticket email.
- * Version:           1.0.1
+ * Version:           1.1.0
  * Extension Class:   Tribe__Extension__PDF_Tickets
  * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
  * Author:            Modern Tribe, Inc.
@@ -803,7 +803,7 @@ if (
 		 * Used to iterate over all the files, such as deleting all. Note that
 		 * sorting is not applied.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://secure.php.net/manual/class.directoryiterator.php
 		 * @link https://secure.php.net/manual/function.glob.php Running with GLOB_NOSORT has comparable speed but is not as flexible.
@@ -840,7 +840,7 @@ if (
 		 * found files, else FALSE (i.e. one or more files matching the pattern
 		 * still exists).
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
 		 * @link https://secure.php.net/manual/function.unlink.php
@@ -859,7 +859,7 @@ if (
 			 * happens, such as moving to a different directory (backup) or
 			 * renaming both of which would protect the files from being deleted.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param array $found_files
 			 * @param string $match_pattern
@@ -884,7 +884,7 @@ if (
 		 * or all the PDFs just got successfully deleted. Otherwise, FALSE (i.e. one
 		 * or more PDF Ticket files for this event still exist on the server).
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @param int $event_id Post ID of a post type that has tickets enabled.
 		 *
@@ -919,7 +919,7 @@ if (
 		 * because it did not before or because it just got deleted), then return
 		 * TRUE, else FALSE (i.e. it still does exist).
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @param int $attendee_id
 		 *
@@ -937,7 +937,7 @@ if (
 			/**
 			 * Action fired after attempting to delete a single PDF Ticket file.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param bool $result Whether or not the PDF Ticket file was
 			 *                          successfully deleted.
@@ -954,7 +954,7 @@ if (
 		 * We do not regenerate the PDF Ticket file because that will happen
 		 * automatically if/when each PDF Ticket link is clicked in the future.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/updated_postmeta/
 		 *
@@ -979,7 +979,7 @@ if (
 			 * gets deleted automatically upon the Attendee Information being
 			 * updated.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param bool   $bail       Set to TRUE to avoid deleting this
 			 *                           Attendee's PDF Ticket file.
@@ -1003,7 +1003,7 @@ if (
 		 * We do not regenerate the PDF Ticket file because that will happen
 		 * automatically if/when each PDF Ticket link is clicked in the future.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
@@ -1032,7 +1032,7 @@ if (
 			 * Useful if you want to prevent the overhead of deleting a file, such
 			 * as only wanting to delete if a certain piece of information changes.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param bool $bail Set to TRUE to avoid deleting this
 			 *                             Attendee's PDF Ticket file.
@@ -1056,7 +1056,7 @@ if (
 		 * We do not regenerate the PDF Ticket files because that will happen
 		 * automatically if/when each PDF Ticket link is clicked in the future.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
@@ -1086,7 +1086,7 @@ if (
 			 * such as only wanting to delete if a specific piece of information
 			 * (that is not displayed in your email template) got changed.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param bool $bail Set to TRUE to avoid deleting this
 			 *                             Attendee's PDF Ticket file.
@@ -1110,7 +1110,7 @@ if (
 		 * We do not regenerate the PDF Ticket files because that will happen
 		 * automatically if/when each PDF Ticket link is clicked in the future.
 		 *
-		 * @since 1.0.1
+		 * @since 1.1.0
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
@@ -1154,7 +1154,7 @@ if (
 				 * information, you may not want to delete all the PDFs if only the
 				 * Venue changed.
 				 *
-				 * @since 1.0.1
+				 * @since 1.1.0
 				 *
 				 * @param bool $bail                    Set to TRUE to avoid deleting
 				 *                                      this Event's PDF Ticket files.
@@ -1211,7 +1211,7 @@ if (
 			 * Filter to customize the ticket link's anchor text, such as to add
 			 * the Attendee ID to the anchor text.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @param $anchor_text
 			 * @param $attendee_id
@@ -1344,7 +1344,7 @@ if (
 			 * Reference vendor/mpdf/config.php, especially since it may not match
 			 * the documentation.
 			 *
-			 * @since 1.0.1
+			 * @since 1.1.0
 			 *
 			 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html An outdated reference.
 			 *

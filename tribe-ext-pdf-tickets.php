@@ -233,6 +233,8 @@ if (
 
 			// Event Tickets Plus: WooCommerce
 			add_action( 'event_ticket_woo_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			// Tagging along with Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger(), which passes Order ID, not Attendee ID
+			add_action( 'wootickets-send-tickets-email', array( $this, 'woo_order_id_do_pdf_and_email' ), 1 );
 
 			// Event Tickets Plus: Easy Digital Downloads
 			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
@@ -256,6 +258,36 @@ if (
 				foreach ( tribe_get_linked_post_types() as $linked_post_type => $value ) {
 					add_action( 'save_post_' . $linked_post_type, array( $this, 'process_updated_tribe_event_linked_post_type' ), 50, 3 );
 				}
+			}
+		}
+
+		/**
+		 * Do the PDF upload and attach to email when triggered via the
+		 * WooCommerce email action hook, which passes the Order ID, not the
+		 * Attendee ID.
+		 *
+		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
+		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
+		 *
+		 * @param int $order_id
+		 */
+		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
+			$order_id = absint( $order_id );
+
+			if ( 0 < $order_id ) {
+				// Runs Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_order_id()
+				$woo_main = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
+
+				$attendee_ids = $woo_main->get_attendees_by_id( $order_id );
+				$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
+
+				// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
+				foreach ( $attendee_ids as $attendee_id ) {
+					$this->do_upload_pdf( $attendee_id );
+				}
+
+				// Now that $this->$attachments_array is expected not empty, send to the WooCommerce email via Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
+				add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf' ) );
 			}
 		}
 
@@ -742,7 +774,7 @@ if (
 				} elseif ( 'Tribe__Tickets__Commerce__PayPal__Main' === $ticket_class ) {
 					add_filter( 'tribe_tpp_email_attachments', array( $this, 'email_attach_pdf', ) );
 				} elseif ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
-					add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf', ) );
+					add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf' ) );
 				} elseif ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $ticket_class ) {
 					add_filter( 'edd_ticket_receipt_attachments', array( $this, 'email_attach_pdf' ) );
 				} else {

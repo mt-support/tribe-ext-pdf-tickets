@@ -668,7 +668,7 @@ if (
 		 *
 		 * @return string
 		 */
-		private function get_attendee_ticket_type_class( $attendee_id = 0 ) {
+		public function get_attendee_ticket_type_class( $attendee_id = 0 ) {
 			$ticket_instance = tribe_tickets_get_ticket_provider( $attendee_id );
 
 			if ( is_object( $ticket_instance ) ) {

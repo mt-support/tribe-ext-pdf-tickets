@@ -664,6 +664,21 @@ if (
 		}
 
 		/**
+		 * Determine an attendee's ticket type's class name.
+		 *
+		 * @return string
+		 */
+		private function get_attendee_ticket_type_class( $attendee_id = 0 ) {
+			$ticket_instance = tribe_tickets_get_ticket_provider( $attendee_id );
+
+			if ( is_object( $ticket_instance ) ) {
+				return $ticket_instance->className;
+			} else {
+				return '';
+			}
+		}
+
+		/**
 		 * Create PDF, save to server, and add to email queue.
 		 *
 		 * @param      $attendee_id ID of attendee ticket.

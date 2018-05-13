@@ -89,6 +89,12 @@ if (
 			 */
 			add_action( 'admin_init', array( $this, 'admin_flush_rewrite_rules_if_needed' ) );
 			register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
+
+			// EDD must be added here, not in $this->init() does not run early enough for these to take effect.
+			// Event Tickets Plus: Easy Digital Downloads
+			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			// Piggy-backing off Tribe__Tickets_Plus__Commerce__EDD__Email::trigger()
+			add_action( 'eddtickets-send-tickets-email', array( $this, 'do_upload_pdf' ), 50, 1 );
 		}
 
 		/**
@@ -235,8 +241,7 @@ if (
 			// Tagging along with Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger(), which passes Order ID, not Attendee ID
 			add_action( 'wootickets-send-tickets-email', array( $this, 'woo_order_id_do_pdf_and_email' ), 1 );
 
-			// Event Tickets Plus: Easy Digital Downloads
-			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			// EDD must be added in $this->construct(), not here, so it is early enough to take effect.
 
 			// After modifying Attendee Information (e.g. self-service), delete its PDF Ticket file so it is no longer outdated.
 			add_action( 'updated_postmeta', array( $this, 'process_updated_post_meta' ), 50, 4 );

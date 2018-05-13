@@ -534,11 +534,21 @@ if (
 		 * @return string
 		 */
 		public function get_pdf_link( $attendee_id ) {
-			$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
+			try {
+				$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
+			}
+			catch ( Exception $e ) {
+				$unique_id = '';
+			}
 
-			$url = home_url( '/' ) . $this->get_download_base_slug();
+			if ( empty( $unique_id ) ) {
+				// We wouldn't expect this to happen.
+				$url = '';
+			} else {
+				$url = home_url( '/' ) . $this->get_download_base_slug();
 
-			$url = trailingslashit( $url ) . $unique_id;
+				$url = trailingslashit( $url ) . $unique_id;
+			}
 
 			return esc_url( $url );
 		}
@@ -1227,27 +1237,33 @@ if (
 			$text = __( 'PDF Ticket', 'tribe-ext-pdf-tickets' );
 
 			/**
-			 * Filter to customize the ticket link's anchor text, such as to add
-			 * the Attendee ID to the anchor text.
+			 * Customize the ticket link's anchor text, such as to add the
+			 * Attendee ID to the anchor text.
 			 *
 			 * @since 1.1.0
 			 *
 			 * @param $anchor_text
 			 * @param $attendee_id
 			 */
-			$text = apply_filters( 'tribe_ext_pdf_tickets_anchor_text', $text, $attendee_id );
+			$text = apply_filters( 'tribe_ext_pdf_tickets_link_anchor_text', $text, $attendee_id );
+
+			$url = esc_url( $this->get_pdf_link( $attendee_id ) );
+
+			if ( empty( $url ) ) {
+				return '';
+			}
+
+			$output = sprintf(
+				'<a href="%s"',
+				$url
+			);
 
 			/**
-			 * Filter to control the link target for Attendees Report links.
+			 * Control the link target for Attendees Report links.
 			 *
 			 * @param $target
 			 */
 			$target = apply_filters( 'tribe_ext_pdf_tickets_link_target', '_blank' );
-
-			$output = sprintf(
-				'<a href="%s"',
-				esc_url( $this->get_pdf_link( $attendee_id ) )
-			);
 
 			if ( ! empty( $target ) ) {
 				$output .= sprintf( ' target="%s"',

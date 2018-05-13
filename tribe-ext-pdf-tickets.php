@@ -168,8 +168,7 @@ if (
 				// Event Tickets
 				add_filter( 'event_tickets_attendees_table_row_actions', array( $this, 'pdf_attendee_table_row_actions' ), 0, 2 );
 
-				add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 2 );
-
+				add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 1 );
 
 				add_action( 'init', array( $this, 'create_pdf_file_creation_deletion_triggers' ), 50 );
 

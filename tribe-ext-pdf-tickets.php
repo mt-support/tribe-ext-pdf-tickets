@@ -1262,11 +1262,104 @@ if (
 		 * Add link to the PDF ticket to the front-end "View your Tickets" page.
 		 *
 		 * @see Tribe__Extension__PDF_Tickets::ticket_link()
+		 *
+		 * @param array $attendee The attendee record.
 		 */
 		public function pdf_attendee_table_row_action_contents( $attendee ) {
-			echo $this->ticket_link( $attendee['attendee_id'] );
+			if ( $this->attendee_allowed_to_and_expected_to_attend( $attendee['attendee_id'] ) ) {
+				echo $this->ticket_link( $attendee['attendee_id'] );
+			}
 		}
 
+		/**
+		 * Determine if an attendee's ticket is in a status that is allowed
+		 * to attend (e.g. paid) and expected to attend (e.g. not voided).
+		 *
+		 * Used to determine if the PDF Ticket link should appear alongside the
+		 * Attendee record in the "View your RSVPs and Tickets" view.
+		 *
+		 * @return bool
+		 */
+		private function attendee_allowed_to_and_expected_to_attend( $attendee_id = 0 ) {
+			$result = false;
+
+			$ticket_class = $this->get_attendee_ticket_type_class( $attendee_id );
+
+			if ( ! empty( $ticket_class ) ) {
+				// Logic found in Tribe__Tickets_Plus__QR::admin_notice()
+				$ticket_post_status = get_post_status( $attendee_id );
+				if (
+					! empty( $ticket_post_status )
+					&& 'trash' !== $ticket_post_status
+				) {
+					// Each ticket type has its own logic
+					if ( 'Tribe__Tickets__RSVP' === $ticket_class ) {
+						// Get RSVP options, which are filterable
+						$all_rsvp_statuses = Tribe__Tickets__Tickets_View::instance()->get_rsvp_options( null, false );
+
+						$yes_statuses = array();
+
+						foreach( $all_rsvp_statuses as $key => $value ) {
+							if ( ! isset( $value['decrease_stock_by'] ) ) {
+								// If omitted, default value is 1
+								$yes_statuses[] = $key;
+							} elseif ( 0 < absint( $value['decrease_stock_by'] ) ) {
+								$yes_statuses[] = $key;
+							}
+						}
+
+						$status = get_post_meta( $attendee_id, Tribe__Tickets__RSVP::ATTENDEE_RSVP_KEY, true );
+
+						if ( in_array( $status, $yes_statuses ) ) {
+							$result = true;
+						}
+					} elseif ( 'Tribe__Tickets__Commerce__PayPal__Main' === $ticket_class ) {
+						$order_status = new Tribe__Tickets__Commerce__PayPal__Orders__Sales();
+
+						$result = $order_status->is_order_completed( $attendee_id );
+					} elseif ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
+						// Same logic as from Tribe__Tickets_Plus__Commerce__WooCommerce__Main::generate_tickets()
+						$woo_settings = new Tribe__Tickets_Plus__Commerce__WooCommerce__Settings();
+
+						$woo_default_dispatch_statuses = $woo_settings->get_default_ticket_generation_statuses();
+
+						$statuses_when_tickets_emailed = (array) tribe_get_option( 'tickets-woo-dispatch-status', $woo_default_dispatch_statuses );
+
+						$order_id = get_post_meta( $attendee_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->attendee_order_key, true );
+
+						$order_object = wc_get_order( $order_id );
+
+						// WC_Abstract_Order::get_status() returns the order statuses without the "wc-" internal prefix, but $statuses_when_tickets_emailed includes it.
+						$order_status = 'wc-' . $order_object->get_status();
+
+						if ( in_array( $order_status, $statuses_when_tickets_emailed )) {
+							$result = true;
+						}
+					} elseif ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $ticket_class ) {
+						$edd_payment_id = get_post_meta( $attendee_id, Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->attendee_order_key, true );
+
+						// Logic is different from Tribe__Tickets_Plus__Commerce__EDD__Stock_Control::get_valid_payment_statuses()
+						if ( edd_is_payment_complete( $edd_payment_id ) ) {
+							$result = true;
+						}
+					} else {}
+				}
+			}
+
+			/**
+			 * Determine if an attendee's ticket is in a status that is allowed
+			 * to attend (e.g. paid) and expected to attend (e.g. not voided).
+			 *
+			 * @param bool   $result
+			 * @param int    $attendee_id
+			 * @param string $ticket_class
+			 *
+			 * @return bool
+			 */
+			$result = apply_filters( 'tribe_ext_pdf_tickets_attendee_allowed_to_and_expected_to_attend', $result, $attendee_id, $ticket_class );
+
+			return (bool) $result;
+		}
 
 		/**
 		 * Add a link to each ticket's PDF ticket on the wp-admin Attendee List.

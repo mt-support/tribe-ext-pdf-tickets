@@ -682,7 +682,7 @@ if (
 		 * Create PDF, save to server, and add to email queue.
 		 *
 		 * @param      $attendee_id ID of attendee ticket.
-		 * @param bool $email Add PDF to email attachments array.
+		 * @param bool $email       Add PDF to email attachments array.
 		 *
 		 * @return bool
 		 */
@@ -691,9 +691,9 @@ if (
 
 			$ticket_instance = tribe_tickets_get_ticket_provider( $attendee_id );
 
-			$ticket_class = $ticket_instance->className;
+			$ticket_class = $this->get_attendee_ticket_type_class( $attendee_id );
 
-			if ( empty( $ticket_instance ) ) {
+			if ( empty( $ticket_class ) ) {
 				return $successful;
 			}
 

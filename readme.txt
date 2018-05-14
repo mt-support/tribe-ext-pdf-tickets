@@ -9,13 +9,11 @@ Stable tag: 1.1.0
 License: GPL version 2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Brief description of the extension.
+Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
-
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and Markdown parsed.
+Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.
 
 == Installation ==
 

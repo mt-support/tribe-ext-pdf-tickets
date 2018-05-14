@@ -1,6 +1,6 @@
 {
   "name": "tribe-ext-pdf-tickets",
-  "description": "Tickets (RSVP, Tribe Commerce PayPal, WooCommerce, and Easy Digital Downloads) become PDFs saved to your Uploads directory and attached to the ticket email.",
+  "description": "Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.",
   "type": "project",
   "require": {
     "mpdf/mpdf": "^7.0.3"

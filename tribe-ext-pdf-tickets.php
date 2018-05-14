@@ -1335,9 +1335,15 @@ if (
 							$result = true;
 						}
 					} elseif ( 'Tribe__Tickets__Commerce__PayPal__Main' === $ticket_class ) {
-						$order_status = new Tribe__Tickets__Commerce__PayPal__Orders__Sales();
+						$attendee_array = Tribe__Tickets__Commerce__PayPal__Main::get_instance()->get_attendees_by_id( $attendee_id );
 
-						$result = $order_status->is_order_completed( $attendee_id );
+						if ( ! empty( $attendee_array[0] ) ) {
+							$order_status = new Tribe__Tickets__Commerce__PayPal__Orders__Sales();
+
+							$result = $order_status->is_order_completed( $attendee_array[0] );
+						} else {
+							$result = false;
+						}
 					} elseif ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
 						// Same logic as from Tribe__Tickets_Plus__Commerce__WooCommerce__Main::generate_tickets()
 						$woo_settings = new Tribe__Tickets_Plus__Commerce__WooCommerce__Settings();

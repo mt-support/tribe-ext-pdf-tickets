@@ -536,8 +536,7 @@ if (
 		public function get_pdf_link( $attendee_id ) {
 			try {
 				$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
-			}
-			catch ( Exception $e ) {
+			} catch ( Exception $e ) {
 				$unique_id = '';
 			}
 
@@ -989,10 +988,10 @@ if (
 		 *
 		 * @see Tribe__Tickets_Plus__Meta::META_KEY
 		 *
-		 * @param int    $meta_id
-		 * @param int    $object_id
+		 * @param int $meta_id
+		 * @param int $object_id
 		 * @param string $meta_key
-		 * @param mixed  $meta_value
+		 * @param mixed $meta_value
 		 *
 		 * @return bool
 		 */
@@ -1010,12 +1009,12 @@ if (
 			 *
 			 * @since 1.1.0
 			 *
-			 * @param bool   $bail       Set to TRUE to avoid deleting this
-			 *                           Attendee's PDF Ticket file.
-			 * @param int    $meta_id
-			 * @param int    $object_id
+			 * @param bool $bail Set to TRUE to avoid deleting this Attendee's
+			 *                   PDF Ticket file.
+			 * @param int $meta_id
+			 * @param int $object_id
 			 * @param string $meta_key
-			 * @param mixed  $meta_value
+			 * @param mixed $meta_value
 			 */
 			$bail = apply_filters( 'tribe_ext_pdf_tickets_process_updated_post_meta', false, $meta_id, $object_id, $meta_key, $meta_value );
 
@@ -1063,8 +1062,8 @@ if (
 			 *
 			 * @since 1.1.0
 			 *
-			 * @param bool $bail Set to TRUE to avoid deleting this
-			 *                             Attendee's PDF Ticket file.
+			 * @param bool $bail Set to TRUE to avoid deleting this Attendee's
+			 *                   PDF Ticket file.
 			 * @param int $attendee_id
 			 * @param WP_Post $post
 			 * @param bool $update
@@ -1117,8 +1116,8 @@ if (
 			 *
 			 * @since 1.1.0
 			 *
-			 * @param bool $bail Set to TRUE to avoid deleting this
-			 *                             Attendee's PDF Ticket file.
+			 * @param bool $bail Set to TRUE to avoid deleting this Attendee's
+			 *                   PDF Ticket file.
 			 * @param int $event_id
 			 * @param WP_Post $post
 			 * @param bool $update
@@ -1131,6 +1130,7 @@ if (
 				return $this->delete_all_tickets_for_event( $event_id );
 			}
 		}
+
 		/**
 		 * Upon updating a Tribe Event's Linked Post Type (e.g. Organizers,
 		 * Venues), delete all of its attached Event Post Type's PDF Ticket
@@ -1185,11 +1185,11 @@ if (
 				 *
 				 * @since 1.1.0
 				 *
-				 * @param bool $bail                    Set to TRUE to avoid deleting
-				 *                                      this Event's PDF Ticket files.
-				 * @param string $linked_post_type      Post Type (e.g. tribe_venue)
+				 * @param bool $bail Set to TRUE to avoid deleting this Attendee's
+				 *                   PDF Ticket file.
+				 * @param string $linked_post_type Post Type (e.g. tribe_venue)
 				 * @param int $linked_post_type_post_id
-				 * @param int $event_id                 Tribe Event post type ID
+				 * @param int $event_id Tribe Event post type ID
 				 * @param WP_Post $post
 				 * @param bool $update
 				 */
@@ -1320,7 +1320,7 @@ if (
 
 						$yes_statuses = array();
 
-						foreach( $all_rsvp_statuses as $key => $value ) {
+						foreach ( $all_rsvp_statuses as $key => $value ) {
 							if ( ! isset( $value['decrease_stock_by'] ) ) {
 								// If omitted, default value is 1
 								$yes_statuses[] = $key;
@@ -1353,7 +1353,7 @@ if (
 						// WC_Abstract_Order::get_status() returns the order statuses without the "wc-" internal prefix, but $statuses_when_tickets_emailed includes it.
 						$order_status = 'wc-' . $order_object->get_status();
 
-						if ( in_array( $order_status, $statuses_when_tickets_emailed )) {
+						if ( in_array( $order_status, $statuses_when_tickets_emailed ) ) {
 							$result = true;
 						}
 					} elseif ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $ticket_class ) {
@@ -1363,7 +1363,9 @@ if (
 						if ( edd_is_payment_complete( $edd_payment_id ) ) {
 							$result = true;
 						}
-					} else {}
+					} else {
+						// Unknown ticket type so do nothing.
+					}
 				}
 			}
 
@@ -1371,8 +1373,8 @@ if (
 			 * Determine if an attendee's ticket is in a status that is allowed
 			 * to attend (e.g. paid) and expected to attend (e.g. not voided).
 			 *
-			 * @param bool   $result
-			 * @param int    $attendee_id
+			 * @param bool $result
+			 * @param int $attendee_id
 			 * @param string $ticket_class
 			 *
 			 * @return bool
@@ -1404,23 +1406,23 @@ if (
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-functions/output.html
 		 *
-		 * @param string $html      HTML content to be turned into PDF.
+		 * @param string $html HTML content to be turned into PDF.
 		 * @param string $file_name Full file name, including path on server.
 		 *                          The name of the file. If not specified, the
 		 *                          document will be sent to the browser
 		 *                          (destination I).
 		 *                          BLANK or omitted: "doc.pdf"
-		 * @param string $dest      I: send the file inline to the browser. The
-		 *                          plug-in is used if available.
-		 *                          The name given by $filename is used when one
-		 *                          selects the "Save as" option on the link
-		 *                          generating the PDF.
-		 *                          D: send to the browser and force a file
-		 *                          download with the name given by $filename.
-		 *                          F: save to a local file with the name given by
-		 *                          $filename (may include a path).
-		 *                          S: return the document as a string.
-		 *                          $filename is ignored.
+		 * @param string $dest I: send the file inline to the browser. The
+		 *                     plug-in is used if available.
+		 *                     The name given by $filename is used when one
+		 *                     selects the "Save as" option on the link
+		 *                     generating the PDF.
+		 *                     D: send to the browser and force a file
+		 *                     download with the name given by $filename.
+		 *                     F: save to a local file with the name given by
+		 *                     $filename (may include a path).
+		 *                     S: return the document as a string.
+		 *                     $filename is ignored.
 		 *
 		 * @return bool
 		 */
@@ -1442,6 +1444,7 @@ if (
 
 			if ( ! empty( $mpdf ) ) {
 				$mpdf->Output( $file_name, $dest );
+
 				return true;
 			} else {
 				return false;
@@ -1504,8 +1507,7 @@ if (
 			try {
 				$mpdf = new \Mpdf\Mpdf( $mpdf_args );
 				$mpdf->WriteHTML( $html );
-			}
-			catch ( Exception $e ) {
+			} catch ( Exception $e ) {
 				// an empty Object
 				$mpdf = new stdClass();
 			}

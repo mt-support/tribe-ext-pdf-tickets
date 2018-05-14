@@ -1,9 +1,9 @@
 {
   "name": "tribe-ext-pdf-tickets",
-  "description": "RSVP, WooCommerce, and Easy Digital Downloads will become PDFs (will be saved to your Uploads directory) and attached to the ticket email.",
+  "description": "Tickets (RSVP, Tribe Commerce PayPal, WooCommerce, and Easy Digital Downloads) become PDFs saved to your Uploads directory and attached to the ticket email.",
   "type": "project",
   "require": {
-    "mpdf/mpdf": "^7.0"
+    "mpdf/mpdf": "^7.0.3"
   },
   "license": "GPL-2.0-only",
   "authors": [

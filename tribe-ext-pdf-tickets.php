@@ -1404,13 +1404,13 @@ if (
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-functions/output.html
 		 *
-		 * @param string $html HTML content to be turned into PDF.
+		 * @param string $html      HTML content to be turned into PDF.
 		 * @param string $file_name Full file name, including path on server.
 		 *                          The name of the file. If not specified, the
 		 *                          document will be sent to the browser
 		 *                          (destination I).
 		 *                          BLANK or omitted: "doc.pdf"
-		 * @param string $dest I: send the file inline to the browser. The
+		 * @param string $dest      I: send the file inline to the browser. The
 		 *                          plug-in is used if available.
 		 *                          The name given by $filename is used when one
 		 *                          selects the "Save as" option on the link
@@ -1439,19 +1439,25 @@ if (
 			ob_clean();
 
 			$mpdf = $this->get_mpdf( $html );
-			$mpdf->Output( $file_name, $dest );
 
-			return true;
+			if ( ! empty( $mpdf ) ) {
+				$mpdf->Output( $file_name, $dest );
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 		/**
 		 * Converts HTML to mPDF object.
 		 *
+		 * Will return an empty object if mPDF throws an exception.
+		 *
 		 * @see mPDF::WriteHTML()
 		 *
 		 * @param string $html The full HTML you want converted to a PDF.
 		 *
-		 * @return mPDF
+		 * @return mPDF|stdClass|object
 		 */
 		protected function get_mpdf( $html ) {
 			require_once( __DIR__ . '/vendor/autoload.php' );
@@ -1460,10 +1466,10 @@ if (
 			$html = str_ireplace( ' !important', '', $html );
 
 			$mpdf_args = array(
-				'mode'   => 'c',
 				// Use only core system fonts. If you change this, such as to blank, you will need to add the missing "vendor/mpdf/**/ttfonts" directory, which got excluded via Composer.
-				'format' => 'LETTER',
+				'mode'   => 'c',
 				// Default is A4
+				'format' => 'LETTER',
 			);
 
 			/**
@@ -1495,9 +1501,14 @@ if (
 			 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html
 			 * @link https://github.com/mpdf/mpdf/pull/490
 			 */
-			$mpdf = new \Mpdf\Mpdf( $mpdf_args );
-
-			$mpdf->WriteHTML( $html );
+			try {
+				$mpdf = new \Mpdf\Mpdf( $mpdf_args );
+				$mpdf->WriteHTML( $html );
+			}
+			catch ( Exception $e ) {
+				// an empty Object
+				$mpdf = new stdClass();
+			}
 
 			return $mpdf;
 		}

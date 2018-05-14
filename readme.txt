@@ -37,19 +37,19 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 == Changelog ==
 
-= 1.1.0 2018-05-15 =
+= 1.1.0 2018-05-17 =
 
 * Feature - Added support for Tribe Commerce PayPal tickets
 * Feature - Added new public methods: `delete_all_tickets_for_event()`, `delete_all_tickets_for_event()`, `delete_single_pdf_ticket()`
-* Tweak - Delete PDF files from server whenever they are detected to be outdated, such as when an Event is updated, an Attendee's Additional Information is updated, or a Venue or Organizer is updated -- added multiple hooks to disable deleting upon these triggers
+* Tweak - Delete PDF files from server whenever they are detected to be outdated, such as when the Event or one of its attached Venues or Organizers is updated or when an Attendee's Additional Information is updated -- added multiple hooks to disable deleting upon these triggers if you choose
 * Tweak - To be more extensible, made these methods public: `ticket_link()`, `get_pdf_link()`, `get_direct_pdf_url()`, `get_pdf_path()`
 * Tweak - Added new `tribe_ext_pdf_tickets_mpdf_args` filter to customize the arguments sent to [mPDF](https://github.com/mpdf/mpdf)
-* Tweak - Update mPDF dependency from version 7.0.0 to version 7.0.3
-* Tweak - Changed mPDF arguments to default to letter-size (8.5 x 11 inches) instead of its default A4 (8.27 x 11.69 inches)
-* Fix - Protect against fatal triggered when Event Tickets plugin got deactivated while this extension was still active
+* Tweak - Update mPDF library from version 7.0.0 to version 7.0.3
+* Tweak - Changed mPDF default arguments to default to letter-size (8.5 x 11 inches) instead of its default A4 (8.27 x 11.69 inches), and arguments are now able to be filtered
+* Fix - Protect against fatal error triggered when Event Tickets plugin got deactivated while this extension was still active
 * Fix - Add additional action hooks for when a ticket is modified and then force regenerating the PDF so it always matches the HTML/email version
-* Fix - PDF email attachments now work according to your "When should attendee records be generated?
-" and "When should tickets be emailed to customers?" settings and when performing "Resend tickets email" from WooCommerce's "Edit order" wp-admin screen
+* Fix - WooCommerce - PDF email attachments now work according to your "When should attendee records be generated?" and "When should tickets be emailed to customers?" settings
+* Fix - WooCommerce - PDF email attachments now work when performing "Resend tickets email" from WooCommerce's "Edit order" wp-admin screen
 * Fix - Corrected text domain and load text domain to make this extension plugin translatable
 
 = 1.0.0 2017-12-06 =
@@ -60,4 +60,4 @@ We're always interested in your feedback and our [premium forums](https://theeve
  * Event Tickets version 4.5.2 or greater
  * (optional) Event Tickets Plus version 4.5.6 or greater
  * (optional) Community Events Tickets version 4.4.3 or greater
-* License is GPLv2 (not "GPLv2+") to be compatible with mPDF's "GPL-2.0-only" license in its `composer.json` file
+* License is GPLv2 (not "GPLv2 or any later version") to be compatible with mPDF's "GPL-2.0-only" license in its `composer.json` file

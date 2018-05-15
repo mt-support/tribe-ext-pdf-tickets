@@ -389,11 +389,16 @@ if (
 		 * @return string
 		 */
 		protected function get_pdf_name( $attendee_id = 0 ) {
-			$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
+			try {
+				$unique_id = $this->get_unique_id_from_attendee_id( $attendee_id );
+			} catch ( Exception $e ) {
+				$unique_id = '';
+			}
 
-			$name = '';
-
-			if ( ! empty( $unique_id ) ) {
+			if ( empty( $unique_id ) ) {
+				// We wouldn't expect this to happen.
+				$name = '';
+			} else {
 				$name = $this->combine_prefix_and_unique_id( $unique_id ) . '.pdf';
 			}
 
@@ -408,7 +413,13 @@ if (
 		 * @return string
 		 */
 		public function get_pdf_path( $attendee_id ) {
-			return $this->uploads_directory_path() . $this->get_pdf_name( $attendee_id );
+			$name = $this->get_pdf_name( $attendee_id );
+
+			if ( empty( $name ) ) {
+				return false;
+			} else {
+				return $this->uploads_directory_path() . $name;
+			}
 		}
 
 		/**
@@ -501,9 +512,14 @@ if (
 		 * @return string
 		 */
 		public function get_direct_pdf_url( $attendee_id = 0 ) {
-			$file_url = $this->uploads_directory_url() . $this->get_pdf_name( $attendee_id );
+			$name = $this->get_pdf_name( $attendee_id );
 
-			return esc_url( $file_url );
+			if ( empty( $name ) ) {
+				return false;
+			} else {
+				$file_url = $this->uploads_directory_url() . $name;
+				return esc_url( $file_url );
+			}
 		}
 
 		/**

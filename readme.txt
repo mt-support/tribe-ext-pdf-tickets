@@ -48,7 +48,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 * Fix - Add additional action hooks for when a ticket is modified and then force regenerating the PDF so it always matches the HTML/email version
 * Fix - WooCommerce - PDF email attachments now work according to your "When should attendee records be generated?" and "When should tickets be emailed to customers?" settings
 * Fix - WooCommerce - PDF email attachments now work when performing "Resend tickets email" from WooCommerce's "Edit order" wp-admin screen
-* Fix - Corrected text domain and load text domain to make this extension plugin translatable
+* Fix - Corrected text domain, load text domain, and add a .pot file to make this extension plugin translatable
 
 = 1.0.0 2017-12-06 =
 

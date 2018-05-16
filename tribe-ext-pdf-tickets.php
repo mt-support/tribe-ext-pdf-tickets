@@ -15,7 +15,7 @@
 // Do not load unless Tribe Common is fully loaded and our class does not yet exist.
 if (
 	class_exists( 'Tribe__Extension' )
-	&& ! class_exists( 'Tribe__Extension__Example' )
+	&& ! class_exists( 'Tribe__Extension__PDF_Tickets' )
 ) {
 	/**
 	 * Extension main class, class begins loading on init() function.

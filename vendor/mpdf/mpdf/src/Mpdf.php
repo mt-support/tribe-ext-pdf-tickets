@@ -20816,11 +20816,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 					}
 					$c['s'] /= $k;
 					$c['maw'] /= $k;
-					if (!isset($c['miw'])){
-						$c['miw'] = $c['maw'];
-					} else {
-						$c['miw'] /= $k;
-					}
+					$c['miw'] /= $k;
 					if (isset($c['h'])) {
 						$c['h'] /= $k;
 					} // mPDF 5.7.4

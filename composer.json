@@ -20,6 +20,7 @@
       ".github",
       ".travis.yml",
       "build-phar.sh",
+      "composer.phar",
       "composer.json",
       "composer.lock",
       "phpunit.xml",

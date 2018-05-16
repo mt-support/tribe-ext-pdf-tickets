@@ -1315,6 +1315,8 @@ if (
 		 * Used to determine if the PDF Ticket link should appear alongside the
 		 * Attendee record in the "View your RSVPs and Tickets" view.
 		 *
+		 * @since 1.1.0
+		 *
 		 * @return bool
 		 */
 		private function attendee_allowed_to_and_expected_to_attend( $attendee_id = 0 ) {

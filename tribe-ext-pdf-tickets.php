@@ -208,12 +208,7 @@ if (
 				if ( 'options-permalink.php' !== $pagenow ) {
 					$message .= '<p>';
 
-					$message .= sprintf( '<a href="%s">%s</a>',
-						esc_url( admin_url( 'options-permalink.php' ) ),
-						__( 'Change your Permalink settings', 'tribe-ext-pdf-tickets' )
-					);
-
-					$message .= __( ' or deactivate this plugin.', 'tribe-ext-pdf-tickets' );
+					$message .= sprintf( __( '<a href="%s">Change your Permalink settings</a> or deactivate this plugin.', esc_url( admin_url( 'options-permalink.php' ) ), 'tribe-ext-pdf-tickets' ) );
 
 					$message .= '</p>';
 				}
@@ -534,7 +529,7 @@ if (
 
 			$base = sprintf( '%s_%s',
 				sanitize_title_with_dashes( $tickets_bases['tickets'][0] ),
-				sanitize_key( __( 'download', 'tribe-ext-pdf-tickets' ) )
+				sanitize_key( _x( 'download', 'The URL rewrite base for a PDF Ticket file download', 'tribe-ext-pdf-tickets' ) )
 			);
 
 			return $base;
@@ -1250,7 +1245,7 @@ if (
 		 * @return string
 		 */
 		public function ticket_link( $attendee_id ) {
-			$text = __( 'PDF Ticket', 'tribe-ext-pdf-tickets' );
+			$text = _x( 'PDF Ticket', 'The anchor text for a PDF Ticket link', 'tribe-ext-pdf-tickets' );
 
 			/**
 			 * Customize the ticket link's anchor text, such as to add the

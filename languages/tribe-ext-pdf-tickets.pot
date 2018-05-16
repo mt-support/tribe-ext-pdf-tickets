@@ -1,0 +1,74 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Event Tickets Extension: PDF Tickets\n"
+"POT-Creation-Date: 2018-05-16 17:20-0500\n"
+"PO-Revision-Date: 2018-05-16 17:20-0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: tribe-ext-pdf-tickets.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: tribe-ext-pdf-tickets.php:158
+#, php-format
+msgid ""
+"%s requires PHP version %s or newer to work (as well as the `mbstring` and "
+"`gd` PHP extensions). Please contact your website host and inquire about "
+"updating PHP."
+msgstr ""
+
+#: tribe-ext-pdf-tickets.php:203
+#, php-format
+msgid "Permalinks must be enabled in order to use %s."
+msgstr ""
+
+#: tribe-ext-pdf-tickets.php:211
+#, php-format
+msgid ""
+"<a href=\"%s\">Change your Permalink settings</a> or deactivate this plugin."
+msgstr ""
+
+#: tribe-ext-pdf-tickets.php:532
+msgctxt "The URL rewrite base for a PDF Ticket file download"
+msgid "download"
+msgstr ""
+
+#: tribe-ext-pdf-tickets.php:1248
+msgctxt "The anchor text for a PDF Ticket link"
+msgid "PDF Ticket"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Event Tickets Extension: PDF Tickets"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/mt-support/tribe-ext-pdf-tickets"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital "
+"Downloads ticket emails will become PDF files saved to your Uploads "
+"directory and then get attached to the ticket emails."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Modern Tribe, Inc."
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://m.tri.be/1971"
+msgstr ""

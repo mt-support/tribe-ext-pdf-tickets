@@ -18,8 +18,6 @@ View mPDF's changelogs at [https://github.com/mpdf/mpdf/releases](https://github
 1. **Once ready to build the finalized .zip to distribute to QA or to customers, run *`php composer.phar archive --format=zip --file tribe-ext-pdf-tickets`***
     1. Because we did not set a `--dir` argument for the `archive` command, Composer will create the .zip right in the project's directory. *#Convenient!*
 1. Unzip this newly-created `tribe-ext-pdf-tickets.zip` file to make sure it got built correctly (excluding files like .gitignore, composer.json, etc).
-1. Rename this `tribe-ext-pdf-tickets.zip` file to include the version number, e.g. `tribe-ext-pdf-tickets-1-1-0.zip`
-    1. We cannot build it with `1-1-0` in the .zip name via Composer because then the extracted folder name will include the version, which is incorrect.
 1. Upload this .zip to TheEventsCalendar.com's Media Library (or wherever you want to distribute it, such as uploading to Central for QA to test).
 1. Delete this .zip file from your hard drive.
 

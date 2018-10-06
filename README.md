@@ -15,7 +15,7 @@ View mPDF's changelogs at [https://github.com/mpdf/mpdf/releases](https://github
 1. Run **`php composer.phar install`**
     1. This will rebuild the `vendor` subdirectory with the latest versions matching the rules in `composer.json`. It will generate the required autoload.php file, the mPDF library, and the libraries required by the autoloader and mPDF. *#Composer just did its magic!*
 1. Make your code changes and test them on your localhost. Commit your changes to GitHub (and you would typically add the `Code Review` tag and go through that process).
-1. **Once ready to build the finalized .zip to distribute to QA or to customers, run *`php composer.phar archive --format=zip --file tribe-ext-pdf-tickets`***
+1. **Once ready to build the finalized .zip to distribute to QA or to customers, run *`php composer.phar archive --file tribe-ext-pdf-tickets`***
     1. Because we did not set a `--dir` argument for the `archive` command, Composer will create the .zip right in the project's directory. *#Convenient!*
 1. Unzip this newly-created `tribe-ext-pdf-tickets.zip` file to make sure it got built correctly (excluding files like .gitignore, composer.json, etc).
 1. Upload this .zip to TheEventsCalendar.com's Media Library (or wherever you want to distribute it, such as uploading to Central for QA to test).

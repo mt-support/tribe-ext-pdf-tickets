@@ -29,5 +29,8 @@
       "ruleset.xml"
     ]
   },
-  "optimize-autoloader": true
+  "config": {
+    "archive-format": "zip",
+    "optimize-autoloader": true
+  }
 }

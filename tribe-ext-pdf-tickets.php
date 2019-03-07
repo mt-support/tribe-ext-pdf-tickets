@@ -471,6 +471,9 @@ if (
 		 * @return int
 		 */
 		private function get_attendee_id_from_unique_id( $unique_id ) {
+			// need to rebuild this here
+			$this->build_active_ticket_post_type_keys();
+
 			$args = array(
 				// cannot use 'post_type' => 'any' because these post types have `exclude_from_search` set to TRUE (because `public` is FALSE)
 				'post_type'      => $this->active_attendee_post_type_keys,
@@ -1457,12 +1460,12 @@ if (
 			 * @link https://mpdf.github.io/what-else-can-i-do/capture-html-output.html
 			 * @link https://stackoverflow.com/a/35574170/893907
 			 */
-			ob_clean();
+			@ob_clean();
 
 			$mpdf = $this->get_mpdf( $html );
 
 			if ( ! empty( $mpdf ) ) {
-				$mpdf->Output( $file_name, $dest );
+				@$mpdf->Output( $file_name, $dest );
 
 				return true;
 			} else {
@@ -1490,6 +1493,7 @@ if (
 			$mpdf_args = array(
 				// Use only core system fonts. If you change this, such as to blank, you will need to add the missing "vendor/mpdf/**/ttfonts" directory, which got excluded via Composer.
 				'mode'   => 'c',
+				'tempDir' => get_temp_dir(),
 				// Default is A4
 				'format' => 'LETTER',
 			);
@@ -1528,6 +1532,7 @@ if (
 				$mpdf->WriteHTML( $html );
 			} catch ( Exception $e ) {
 				// an empty Object
+				do_action( 'log', $e );
 				$mpdf = new stdClass();
 			}
 

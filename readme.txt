@@ -37,7 +37,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 = 1.2.0 2019-03-29 =
 
-* Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases
+* Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases [122622]
 * Tweak - Fixed notices around caching directories
 * Tweak - Add "WC tested up to" to plugin header to avoid the "Not tested with the active version of WooCommerce" message within the WooCommerce Status page [117703]
 

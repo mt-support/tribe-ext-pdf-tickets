@@ -40,6 +40,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 * Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases [122622]
 * Tweak - Fixed notices around caching directories
 * Tweak - Add "WC tested up to" to plugin header to avoid the "Not tested with the active version of WooCommerce" message within the WooCommerce Status page [117703]
+* Tweak - Update mPDF library from version 7.0.3 to version 8.0.0
 
 = 1.1.0 2018-05-16 =
 

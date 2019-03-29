@@ -1468,15 +1468,13 @@ if (
 		protected function get_mpdf( $html ) {
 			require_once( __DIR__ . '/vendor/autoload.php' );
 
-			// to avoid this fatal error: https://github.com/mpdf/mpdf/issues/524
+			// to avoid this fatal error: https://github.com/mpdf/mpdf/issues/1009
 			$html = str_ireplace( ' !important', '', $html );
 
 			$mpdf_args = [
-				// Use only core system fonts. If you change this, such as to blank, you will need to add the missing "vendor/mpdf/**/ttfonts" directory, which got excluded via Composer.
 				'mode'   => 'c',
 				'tempDir' => get_temp_dir(),
-				// Default is A4
-				'format' => 'LETTER',
+				'format' => 'LETTER', // Default is A4
 			];
 
 			/**

@@ -261,7 +261,7 @@ if (
 		 * Do the PDF upload and attach to email when triggered via the WooCommerce email action hook, which passes the
 		 * Order ID, not the Attendee ID.
 		 *
-		 * @param int $order_id
+		 * @param int|string $order_id
 		 *
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
@@ -693,7 +693,7 @@ if (
 		/**
 		 * Create PDF, save to server, and add to email queue.
 		 *
-		 * @param      $attendee_id ID of attendee ticket.
+		 * @param int  $attendee_id ID of attendee ticket.
 		 * @param bool $email       Add PDF to email attachments array.
 		 *
 		 * @return bool

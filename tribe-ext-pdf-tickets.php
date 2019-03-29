@@ -57,7 +57,7 @@ if (
 		 *
 		 * @var array
 		 */
-		protected $attachments_array = array();
+		protected $attachments_array = [];
 
 		/**
 		 * Active attendee post type keys.
@@ -66,7 +66,7 @@ if (
 		 *
 		 * @var array
 		 */
-		protected $active_attendee_post_type_keys = array();
+		protected $active_attendee_post_type_keys = [];
 
 		/**
 		 * Setup the Extension's properties.
@@ -76,7 +76,7 @@ if (
 		public function construct() {
 			$this->add_required_plugin( 'Tribe__Tickets__Main', '4.5.2' );
 
-			add_action( 'tribe_plugins_loaded', array( $this, 'required_tribe_classes' ), 0 );
+			add_action( 'tribe_plugins_loaded', [ $this, 'required_tribe_classes' ], 0 );
 
 			/**
 			 * Ideally, we would only flush rewrite rules on plugin activation and
@@ -87,14 +87,14 @@ if (
 			 *
 			 * @link https://developer.wordpress.org/reference/functions/flush_rewrite_rules/#comment-597
 			 */
-			add_action( 'admin_init', array( $this, 'admin_flush_rewrite_rules_if_needed' ) );
+			add_action( 'admin_init', [ $this, 'admin_flush_rewrite_rules_if_needed' ] );
 			register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
 
 			// EDD must be added here, not in $this->init() does not run early enough for these to take effect.
 			// Event Tickets Plus: Easy Digital Downloads
-			add_action( 'event_ticket_edd_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			add_action( 'event_ticket_edd_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 			// Piggy-backing off Tribe__Tickets_Plus__Commerce__EDD__Email::trigger()
-			add_action( 'eddtickets-send-tickets-email', array( $this, 'do_upload_pdf' ), 50, 1 );
+			add_action( 'eddtickets-send-tickets-email', [ $this, 'do_upload_pdf' ], 50, 1 );
 		}
 
 		/**
@@ -171,19 +171,19 @@ if (
 			$permalink_structure = get_option( 'permalink_structure' );
 			if ( ! empty( $permalink_structure ) ) {
 				// Event Tickets
-				add_filter( 'event_tickets_attendees_table_row_actions', array( $this, 'pdf_attendee_table_row_actions' ), 0, 2 );
+				add_filter( 'event_tickets_attendees_table_row_actions', [ $this, 'pdf_attendee_table_row_actions' ], 0, 2 );
 
-				add_action( 'event_tickets_orders_attendee_contents', array( $this, 'pdf_attendee_table_row_action_contents' ), 10, 1 );
+				add_action( 'event_tickets_orders_attendee_contents', [ $this, 'pdf_attendee_table_row_action_contents' ], 10, 1 );
 
-				add_action( 'init', array( $this, 'create_pdf_file_creation_deletion_triggers' ), 50 );
+				add_action( 'init', [ $this, 'create_pdf_file_creation_deletion_triggers' ], 50 );
 
 				// Add rewrite rules
-				add_action( 'init', array( $this, 'add_pdf_file_rewrite_rules' ) );
-				add_action( 'query_vars', array( $this, 'add_custom_query_vars' ) );
-				add_action( 'redirect_canonical', array( $this, 'make_non_trailing_slash_the_canonical' ), 10, 2 );
+				add_action( 'init', [ $this, 'add_pdf_file_rewrite_rules' ] );
+				add_action( 'query_vars', [ $this, 'add_custom_query_vars' ] );
+				add_action( 'redirect_canonical', [ $this, 'make_non_trailing_slash_the_canonical' ], 10, 2 );
 
 				// For generating a PDF on the fly
-				add_action( 'template_redirect', array( $this, 'load_pdf' ) );
+				add_action( 'template_redirect', [ $this, 'load_pdf' ] );
 			} else {
 				if (
 					! is_admin()
@@ -223,36 +223,36 @@ if (
 		 */
 		public function create_pdf_file_creation_deletion_triggers() {
 			// do_upload_pdf() when tickets are created
-			add_action( 'event_tickets_rsvp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			add_action( 'event_tickets_rsvp_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 
 			// Event Tickets: Tribe PayPal
-			add_action( 'event_tickets_tpp_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			add_action( 'event_tickets_tpp_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 
 			// Event Tickets Plus: WooCommerce
-			add_action( 'event_ticket_woo_attendee_created', array( $this, 'do_upload_pdf' ), 50, 1 );
+			add_action( 'event_ticket_woo_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 			// Tagging along with Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger(), which passes Order ID, not Attendee ID
-			add_action( 'wootickets-send-tickets-email', array( $this, 'woo_order_id_do_pdf_and_email' ), 1 );
+			add_action( 'wootickets-send-tickets-email', [ $this, 'woo_order_id_do_pdf_and_email' ], 1 );
 
 			// EDD must be added in $this->construct(), not here, so it is early enough to take effect.
 
 			// After modifying Attendee Information (e.g. self-service), delete its PDF Ticket file so it is no longer outdated.
-			add_action( 'updated_postmeta', array( $this, 'process_updated_post_meta' ), 50, 4 );
+			add_action( 'updated_postmeta', [ $this, 'process_updated_post_meta' ], 50, 4 );
 
 			// After modifying an Attendee, delete its PDF Ticket file so it is no longer outdated. Not sure when it might be triggered but it's here for completeness.
 			foreach ( $this->active_attendee_post_type_keys as $active_attendee_post_type_keys ) {
-				add_action( 'save_post_' . $active_attendee_post_type_keys, array( $this, 'process_updated_attendee' ), 50, 3 );
+				add_action( 'save_post_' . $active_attendee_post_type_keys, [ $this, 'process_updated_attendee' ], 50, 3 );
 			}
 
 			// After modifying an existing Event with Tickets, delete all of its PDF Tickets files so they are no longer outdated.
 			$post_types_tickets_enabled = (array) Tribe__Tickets__Main::instance()->post_types();
 			foreach ( $post_types_tickets_enabled as $post_type ) {
-				add_action( 'save_post_' . $post_type, array( $this, 'process_updated_event' ), 50, 3 );
+				add_action( 'save_post_' . $post_type, [ $this, 'process_updated_event' ], 50, 3 );
 			}
 
 			// Tribe Events Linked Post Types
 			if ( function_exists( 'tribe_get_linked_post_types' ) ) {
 				foreach ( tribe_get_linked_post_types() as $linked_post_type => $value ) {
-					add_action( 'save_post_' . $linked_post_type, array( $this, 'process_updated_tribe_event_linked_post_type' ), 50, 3 );
+					add_action( 'save_post_' . $linked_post_type, [ $this, 'process_updated_tribe_event_linked_post_type' ], 50, 3 );
 				}
 			}
 		}
@@ -282,7 +282,7 @@ if (
 				}
 
 				// Now that $this->$attachments_array is expected not empty, send to the WooCommerce email via Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
-				add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf' ) );
+				add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
 			}
 		}
 
@@ -462,19 +462,19 @@ if (
 			// need to rebuild this here
 			$this->build_active_ticket_post_type_keys();
 
-			$args = array(
+			$args = [
 				// cannot use 'post_type' => 'any' because these post types have `exclude_from_search` set to TRUE (because `public` is FALSE)
 				'post_type'      => $this->active_attendee_post_type_keys,
 				'nopaging'       => true,
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
-				'meta_query'     => array(
-					array(
+				'meta_query'     => [
+					[
 						'key'   => $this->pdf_ticket_meta_key,
 						'value' => $unique_id,
-					)
-				)
-			);
+					]
+				]
+			];
 
 			$attendee_id_array = get_posts( $args );
 
@@ -724,7 +724,7 @@ if (
 				return $successful;
 			}
 
-			$attendees_array = array();
+			$attendees_array = [];
 
 			foreach ( $attendees as $attendee ) {
 				if ( $attendee['attendee_id'] == $attendee_id ) {
@@ -796,13 +796,13 @@ if (
 				$this->attachments_array[] = $file_name;
 
 				if ( 'Tribe__Tickets__RSVP' === $ticket_class ) {
-					add_filter( 'tribe_rsvp_email_attachments', array( $this, 'email_attach_pdf' ) );
+					add_filter( 'tribe_rsvp_email_attachments', [ $this, 'email_attach_pdf' ] );
 				} elseif ( 'Tribe__Tickets__Commerce__PayPal__Main' === $ticket_class ) {
-					add_filter( 'tribe_tpp_email_attachments', array( $this, 'email_attach_pdf', ) );
+					add_filter( 'tribe_tpp_email_attachments', [ $this, 'email_attach_pdf', ] );
 				} elseif ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
-					add_filter( 'tribe_tickets_plus_woo_email_attachments', array( $this, 'email_attach_pdf' ) );
+					add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
 				} elseif ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $ticket_class ) {
-					add_filter( 'edd_ticket_receipt_attachments', array( $this, 'email_attach_pdf' ) );
+					add_filter( 'edd_ticket_receipt_attachments', [ $this, 'email_attach_pdf' ] );
 				} else {
 					// unknown ticket type so no emailing to do
 
@@ -842,7 +842,7 @@ if (
 			$file_name_prefix        = $this->get_file_name_prefix();
 			$file_name_prefix_length = strlen( $file_name_prefix );
 
-			$found_files = array();
+			$found_files = [];
 
 			foreach ( new DirectoryIterator( $uploads_dir ) as $file_info ) {
 				if (
@@ -924,7 +924,7 @@ if (
 				$attendee_ids = wp_list_pluck( $attendees, 'attendee_id' );
 
 				if ( 0 < count( $attendee_ids ) ) {
-					$success_array = array();
+					$success_array = [];
 
 					foreach ( $attendee_ids as $attendee_id ) {
 						$success_array[] = $this->delete_single_pdf_ticket( $attendee_id );
@@ -1164,7 +1164,7 @@ if (
 
 			$event_ids = wp_list_pluck( $linked_events, 'ID' );
 
-			$success_array = array();
+			$success_array = [];
 
 			foreach ( $event_ids as $event_id ) {
 				/**
@@ -1315,7 +1315,7 @@ if (
 						// Get RSVP options, which are filterable
 						$all_rsvp_statuses = Tribe__Tickets__Tickets_View::instance()->get_rsvp_options( null, false );
 
-						$yes_statuses = array();
+						$yes_statuses = [];
 
 						foreach ( $all_rsvp_statuses as $key => $value ) {
 							if ( ! isset( $value['decrease_stock_by'] ) ) {
@@ -1471,13 +1471,13 @@ if (
 			// to avoid this fatal error: https://github.com/mpdf/mpdf/issues/524
 			$html = str_ireplace( ' !important', '', $html );
 
-			$mpdf_args = array(
+			$mpdf_args = [
 				// Use only core system fonts. If you change this, such as to blank, you will need to add the missing "vendor/mpdf/**/ttfonts" directory, which got excluded via Composer.
 				'mode'   => 'c',
 				'tempDir' => get_temp_dir(),
 				// Default is A4
 				'format' => 'LETTER',
-			);
+			];
 
 			/**
 			 * Filter the arguments with which to run mPDF.

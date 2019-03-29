@@ -10,6 +10,7 @@
  * License:           GPL version 2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tribe-ext-pdf-tickets
+ * WC tested up to:   3.5.7
  */
 
 // Do not load unless Tribe Common is fully loaded and our class does not yet exist.

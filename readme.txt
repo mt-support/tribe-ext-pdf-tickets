@@ -3,7 +3,7 @@ Contributors: ModernTribe
 Donate link: http://m.tri.be/29
 Tags: events, calendar
 Requires at least: 4.5
-Tested up to: 5.1
+Tested up to: 5.1.1
 Requires PHP: 5.6
 Stable tag: 1.2.0
 License: GPL version 2
@@ -35,9 +35,11 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 == Changelog ==
 
-= 1.2.0 2019-03-07 =
+= 1.2.0 2019-03-29 =
+
 * Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases
-* Tweak - fixed notices around caching directories
+* Tweak - Fixed notices around caching directories
+* Tweak - Add "WC tested up to" to plugin header to avoid the "Not tested with the active version of WooCommerce" message within the WooCommerce Status page [117703]
 
 = 1.1.0 2018-05-16 =
 

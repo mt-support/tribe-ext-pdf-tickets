@@ -1,6 +1,6 @@
 language: php
 
-dist: trusty
+dist: xenial
 
 group: edge
 
@@ -9,6 +9,7 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
   - nightly
 
 matrix:
@@ -17,15 +18,21 @@ matrix:
 
     - env: LINT=1
       php: 7.1
-    - env: COVERAGE=1
-      php: 7.1
+    #- env: COVERAGE=1
+    #  php: 7.1
 
   allow_failures:
     - php: nightly
 
 install:
   - composer self-update
-  - composer install --ignore-platform-reqs
+  - echo "${TRAVIS_PHP_VERSION:0:3}"
+  - |
+    if [[ "${TRAVIS_PHP_VERSION:0:7}" == "nightly" ]]; then
+      composer install --ignore-platform-reqs
+    else
+      composer install
+    fi
 
 script:
   - |
@@ -38,5 +45,6 @@ script:
     fi
 
 notifications:
-
-  email: change
+  email:
+    on_success: change
+    on_failure: always

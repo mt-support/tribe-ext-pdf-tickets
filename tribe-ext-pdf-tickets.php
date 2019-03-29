@@ -128,9 +128,8 @@ if (
 		/**
 		 * Extension initialization and hooks.
 		 *
-		 * mPDF version 7.0+ requires PHP 5.6+ with the mbstring and gd extensions.
-		 * Permalinks are required to be set in order to use this plugin. If they
-		 * are not set, display an informative admin error with a link to the
+		 * mPDF version 7.0+ requires PHP 5.6+ with the mbstring and gd extensions. Permalinks are required to be set in
+		 * order to use this plugin. If they are not set, display an informative admin error with a link to the
 		 * Permalink Settings admin screen and do not load the rest of this plugin.
 		 */
 		public function init() {
@@ -218,11 +217,9 @@ if (
 		}
 
 		/**
-		 * Setup the hooks needed to trigger PDF Ticket file creation and
-		 * deletion when appropriate.
+		 * Setup the hooks needed to trigger PDF Ticket file creation and deletion when appropriate.
 		 *
-		 * Cannot run in $this->init() because that is too early to run
-		 * tribe_get_linked_post_types().
+		 * Cannot run in $this->init() because that is too early to run tribe_get_linked_post_types().
 		 */
 		public function create_pdf_file_creation_deletion_triggers() {
 			// do_upload_pdf() when tickets are created
@@ -261,14 +258,13 @@ if (
 		}
 
 		/**
-		 * Do the PDF upload and attach to email when triggered via the
-		 * WooCommerce email action hook, which passes the Order ID, not the
-		 * Attendee ID.
-		 *
-		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
-		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
+		 * Do the PDF upload and attach to email when triggered via the WooCommerce email action hook, which passes the
+		 * Order ID, not the Attendee ID.
 		 *
 		 * @param int $order_id
+		 *
+		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
+		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
 		 */
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
 			$order_id = absint( $order_id );
@@ -291,16 +287,12 @@ if (
 		}
 
 		/**
-		 * Get the absolute path to the WordPress uploads directory,
-		 * with a trailing slash.
+		 * Get the absolute path to the WordPress uploads directory, with a trailing slash.
 		 *
-		 * It will return a path to where the WordPress /uploads/ directory is,
-		 * whether it is in the default location or whether a constant has been
-		 * defined or a filter used to specify an alternate location. The path
-		 * it returns will look something like
-		 * /path/to/wordpress/wp-content/uploads/
-		 * regardless of the "Organize my uploads into month- and year-based
-		 * folders" option in wp-admin > Settings > Media.
+		 * It will return a path to where the WordPress /uploads/ directory is, whether it is in the default location or
+		 * whether a constant has been defined or a filter used to specify an alternate location. The path it returns
+		 * will look something like /path/to/wordpress/wp-content/uploads/ regardless of the "Organize my uploads into
+		 * month- and year-based folders" option in wp-admin > Settings > Media.
 		 *
 		 * @return string The uploads directory path.
 		 */
@@ -323,12 +315,9 @@ if (
 		/**
 		 * Get the URL to the WordPress uploads directory, with a trailing slash.
 		 *
-		 * It will return a URL to where the WordPress /uploads/ directory is,
-		 * whether it is in the default location or whether a constant has been
-		 * defined or a filter used to specify an alternate location. The URL
-		 * it returns will look something like
-		 * http://example.com/wp-content/uploads/ regardless of the current
-		 * month we are in.
+		 * It will return a URL to where the WordPress /uploads/ directory is, whether it is in the default location or
+		 * whether a constant has been defined or a filter used to specify an alternate location. The URL it returns
+		 * will look something like http://example.com/wp-content/uploads/ regardless of the current month we are in.
 		 *
 		 * @return string The uploads directory URL.
 		 */
@@ -376,10 +365,9 @@ if (
 		/**
 		 * Full PDF file name on the server.
 		 *
-		 * Does not include leading server path or URL.
-		 * Does include the .pdf file extension.
+		 * Does not include leading server path or URL. Does include the .pdf file extension.
 		 *
-		 * @param $attendee_id Ticket Attendee ID.
+		 * @param int $attendee_id Ticket Attendee ID.
 		 *
 		 * @return string
 		 */
@@ -403,7 +391,7 @@ if (
 		/**
 		 * Get absolute path to the PDF file, including ".pdf" at the end.
 		 *
-		 * @param $attendee_id
+		 * @param int $attendee_id
 		 *
 		 * @return string
 		 */
@@ -420,8 +408,8 @@ if (
 		/**
 		 * Get the Unique ID for the given Attendee ID.
 		 *
-		 * Lookup Unique ID in the database. If it does not exist yet, generate it
-		 * and save it to the database for future lookups.
+		 * Lookup Unique ID in the database. If it does not exist yet, generate it and save it to the database for
+		 * future lookups.
 		 *
 		 * @param int $attendee_id
 		 *
@@ -567,8 +555,7 @@ if (
 		}
 
 		/**
-		 * The regex to determine if a string is in the proper format to be a
-		 * Unique ID in the context of this extension.
+		 * The regex to determine if a string is in the proper format to be a Unique ID in the context of this extension.
 		 *
 		 * @return string
 		 */
@@ -606,11 +593,9 @@ if (
 		/**
 		 * Add the needed WordPress rewrite rules.
 		 *
-		 * example.com/tickets_download/{unique_id} (without trailing slash) goes
-		 * to the PDF file, and
-		 * example.com/tickets_download/ (with or without trailing slash) goes to
-		 * the site's homepage for the sake of search engines or curious users
-		 * exploring hackable URLs.
+		 * example.com/tickets_download/{unique_id} (without trailing slash) goes to the PDF file, and
+		 * example.com/tickets_download/ (with or without trailing slash) goes to the site's homepage for the sake of
+		 * search engines or curious users exploring hackable URLs.
 		 */
 		public function add_pdf_file_rewrite_rules() {
 			$query_for_file = sprintf( 'index.php?%s=$matches[1]', $this->pdf_unique_id_query_arg_key );
@@ -638,13 +623,12 @@ if (
 		 * Disable WordPress trying to add a trailing slash to our PDF file URLs.
 		 *
 		 * Example: http://example.com/tickets_download/{unique_id}
-		 * Without the leading ^ because we are comparing against the full URL,
-		 * not creating a rewrite rule. Without the ending $ because we might have a
-		 * URL query string.
+		 * Without the leading ^ because we are comparing against the full URL, not creating a rewrite rule. Without the
+		 * ending $ because we might have a URL query string.
 		 *
-		 * @param $redirect_url  The URL with a trailing slash added (in most
+		 * @param string $redirect_url  The URL with a trailing slash added (in most
 		 *                       setups).
-		 * @param $requested_url Our unmodified URL--without a trailing slash.
+		 * @param string $requested_url Our unmodified URL--without a trailing slash.
 		 *
 		 * @return bool|string
 		 */
@@ -660,12 +644,10 @@ if (
 
 
 		/**
-		 * Ideally, we would only flush rewrite rules on plugin activation, but we
-		 * cannot use register_activation_hook() due to the timing of when
-		 * extensions load. Therefore, we flush rewrite rules on every visit to the
-		 * wp-admin Plugins screen (where we'd expect you to be if you just
-		 * activated a plugin)... only if our rewrite rule is not already in the
-		 * rewrite rules array.
+		 * Ideally, we would only flush rewrite rules on plugin activation, but we cannot use register_activation_hook()
+		 * due to the timing of when extensions load. Therefore, we flush rewrite rules on every visit to the wp-admin
+		 * Plugins screen (where we'd expect you to be if you just activated a plugin)... only if our rewrite rule is
+		 * not already in the rewrite rules array.
 		 */
 		public function admin_flush_rewrite_rules_if_needed() {
 			global $pagenow;
@@ -693,6 +675,8 @@ if (
 
 		/**
 		 * Determine an attendee's ticket type's class name.
+		 *
+		 * @param int $attendee_id
 		 *
 		 * @return string
 		 */
@@ -839,11 +823,9 @@ if (
 		}
 
 		/**
-		 * Find all the PDF files in the Uploads directory that match our naming
-		 * convention.
+		 * Find all the PDF files in the Uploads directory that match our naming convention.
 		 *
-		 * Used to iterate over all the files, such as deleting all. Note that
-		 * sorting is not applied.
+		 * Used to iterate over all the files, such as deleting all. Note that sorting is not applied.
 		 *
 		 * @since 1.1.0
 		 *
@@ -878,9 +860,8 @@ if (
 		/**
 		 * Delete ALL of the PDF Ticket files from the upload directory.
 		 *
-		 * After trying to delete all found files, returns TRUE if there are no more
-		 * found files, else FALSE (i.e. one or more files matching the pattern
-		 * still exists).
+		 * After trying to delete all found files, returns TRUE if there are no more found files, else FALSE (i.e. one
+		 * or more files matching the pattern still exists).
 		 *
 		 * @since 1.1.0
 		 *
@@ -888,6 +869,8 @@ if (
 		 * @link https://secure.php.net/manual/function.unlink.php
 		 *
 		 * @see Tribe__Extension__PDF_Tickets::find_all_pdf_ticket_files()
+		 *
+		 * @throws Exception
 		 *
 		 * @return bool
 		 */
@@ -922,9 +905,9 @@ if (
 		/**
 		 * Delete all an event's PDF Ticket files from the server.
 		 *
-		 * TRUE if the event does not have any tickets, does not have any attendees,
-		 * or all the PDFs just got successfully deleted. Otherwise, FALSE (i.e. one
-		 * or more PDF Ticket files for this event still exist on the server).
+		 * TRUE if the event does not have any tickets, does not have any attendees, or all the PDFs just got
+		 * successfully deleted. Otherwise, FALSE (i.e. one or more PDF Ticket files for this event still exist
+		 * on the server).
 		 *
 		 * @since 1.1.0
 		 *
@@ -933,7 +916,7 @@ if (
 		 * @return bool
 		 */
 		public function delete_all_tickets_for_event( $event_id = 0 ) {
-			$sucessful = true;
+			$successful = true;
 
 			if ( tribe_events_has_tickets( $event_id ) ) {
 				$attendees = (array) tribe_tickets_get_attendees( $event_id );
@@ -947,19 +930,18 @@ if (
 						$success_array[] = $this->delete_single_pdf_ticket( $attendee_id );
 					}
 
-					$sucessful = ! in_array( false, $success_array );
+					$successful = ! in_array( false, $success_array );
 				}
 			}
 
-			return $sucessful;
+			return $successful;
 		}
 
 		/**
 		 * Delete a single attendee's PDF Ticket file from the server.
 		 *
-		 * If, at the end of this method's logic, the file does not exist (either
-		 * because it did not before or because it just got deleted), then return
-		 * TRUE, else FALSE (i.e. it still does exist).
+		 * If, at the end of this method's logic, the file does not exist (either because it did not before or because
+		 * it just got deleted), then return TRUE, else FALSE (i.e. it still does exist).
 		 *
 		 * @since 1.1.0
 		 *
@@ -993,8 +975,8 @@ if (
 		/**
 		 * Upon updating an Attendee, delete its PDF Ticket file.
 		 *
-		 * We do not regenerate the PDF Ticket file because that will happen
-		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 * We do not regenerate the PDF Ticket file because that will happen automatically if/when each PDF Ticket link
+		 * is clicked in the future.
 		 *
 		 * @since 1.1.0
 		 *
@@ -1042,8 +1024,8 @@ if (
 		/**
 		 * Upon updating an Attendee, delete its PDF Ticket file.
 		 *
-		 * We do not regenerate the PDF Ticket file because that will happen
-		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 * We do not regenerate the PDF Ticket file because that will happen automatically if/when each PDF Ticket link
+		 * is clicked in the future.
 		 *
 		 * @since 1.1.0
 		 *
@@ -1095,8 +1077,8 @@ if (
 		 * Upon updating an Event (any post type with tickets), delete all of its
 		 * PDF Ticket files so they are not outdated.
 		 *
-		 * We do not regenerate the PDF Ticket files because that will happen
-		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 * We do not regenerate the PDF Ticket files because that will happen automatically if/when each PDF Ticket
+		 * link is clicked in the future.
 		 *
 		 * @since 1.1.0
 		 *
@@ -1146,12 +1128,11 @@ if (
 		}
 
 		/**
-		 * Upon updating a Tribe Event's Linked Post Type (e.g. Organizers,
-		 * Venues), delete all of its attached Event Post Type's PDF Ticket
-		 * files so they are not outdated.
+		 * Upon updating a Tribe Event's Linked Post Type (e.g. Organizers, Venues), delete all of its attached Event
+		 * Post Type's PDF Ticket files so they are not outdated.
 		 *
-		 * We do not regenerate the PDF Ticket files because that will happen
-		 * automatically if/when each PDF Ticket link is clicked in the future.
+		 * We do not regenerate the PDF Ticket files because that will happen automatically if/when each PDF Ticket
+		 * link is clicked in the future.
 		 *
 		 * @since 1.1.0
 		 *
@@ -1224,8 +1205,8 @@ if (
 		/**
 		 * Attach the queued PDF(s) to the ticket email.
 		 *
-		 * RSVP, Tribe PayPal, WooCommerce, and EDD filters all just pass an
-		 * attachments array so we can get away with a single, simple function here.
+		 * RSVP, Tribe PayPal, WooCommerce, and EDD filters all just pass an attachments array so we can get away with
+		 * a single, simple function here.
 		 *
 		 * @param $attachments
 		 *
@@ -1307,11 +1288,11 @@ if (
 		}
 
 		/**
-		 * Determine if an attendee's ticket is in a status that is allowed
-		 * to attend (e.g. paid) and expected to attend (e.g. not voided).
+		 * Determine if an attendee's ticket is in a status that is allowed to attend (e.g. paid) and expected to
+		 * attend (e.g. not voided).
 		 *
-		 * Used to determine if the PDF Ticket link should appear alongside the
-		 * Attendee record in the "View your RSVPs and Tickets" view.
+		 * Used to determine if the PDF Ticket link should appear alongside the Attendee record in the "View your
+		 * RSVPs and Tickets" view.
 		 *
 		 * @since 1.1.0
 		 *
@@ -1409,8 +1390,8 @@ if (
 		/**
 		 * Add a link to each ticket's PDF ticket on the wp-admin Attendee List.
 		 *
-		 * Community Events Tickets' Attendee List/Table comes from the same
-		 * source as the wp-admin one so no extra work to get it working there.
+		 * Community Events Tickets' Attendee List/Table comes from the same source as the wp-admin one so no extra work
+		 * to get it working there.
 		 *
 		 * @see Tribe__Extension__PDF_Tickets::ticket_link()
 		 */
@@ -1501,8 +1482,7 @@ if (
 			/**
 			 * Filter the arguments with which to run mPDF.
 			 *
-			 * Reference vendor/mpdf/config.php, especially since it may not match
-			 * the documentation.
+			 * Reference vendor/mpdf/config.php, especially since it may not match the documentation.
 			 *
 			 * @since 1.1.0
 			 *
@@ -1540,9 +1520,8 @@ if (
 		}
 
 		/**
-		 * Tell WordPress to 404 instead of continuing loading the template it would
-		 * otherwise load, such as matching lower-priority rewrite rule matches
-		 * (e.g. page or attachment).
+		 * Tell WordPress to 404 instead of continuing loading the template it would otherwise load, such as matching
+		 * lower-priority rewrite rule matches (e.g. page or attachment).
 		 */
 		private function force_404() {
 			global $wp_query;
@@ -1552,13 +1531,11 @@ if (
 		}
 
 		/**
-		 * Create and upload a 404'd PDF Ticket, then redirect to it now that
-		 * it exists.
+		 * Create and upload a 404'd PDF Ticket, then redirect to it now that it exists.
 		 *
-		 * If we attempted to load a PDF Ticket but it was not found (404), then
-		 * create the PDF Ticket, upload it to the server, and reload the attempted
-		 * URL, adding a query string on the end as a cache buster and so the
-		 * 307 Temporary Redirect code is technically valid.
+		 * If we attempted to load a PDF Ticket but it was not found (404), then create the PDF Ticket, upload it to the
+		 * server, and reload the attempted URL, adding a query string on the end as a cache buster and so the 307
+		 * Temporary Redirect code is technically valid.
 		 *
 		 * @see Tribe__Extension__PDF_Tickets::do_upload_pdf()
 		 */

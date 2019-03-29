@@ -26,18 +26,3 @@ View mPDF's changelogs at [https://github.com/mpdf/mpdf/releases](https://github
 Like some of the other files you see in this GitHub repository, this README.md file does not get included in the final .zip that makes it to the customer. It and other files are excluded via Composer's build process, documented above.
 
 However, if someone updates the plugin via GitHub Updater, they _will_ receive the complete repository, not the Composer-zipped version. This is why the `vendor` subdirectory gets committed to our repository. The instructions above are for publishing the plugin to TheEventsCalendar.com's Extension library.
-
-Therefore, you should delete **all but the DejaVu font set** from `vendor/mpdf/mpdf/ttfonts/` 
-
-### Known Issues ###
-
-mPDF has these known issues, for which you might need to modify the Composer-generated mpdf directory's files **before distributing**:
-* [https://github.com/mpdf/mpdf/pull/490/files](https://github.com/mpdf/mpdf/pull/490/files) must be manually performed **after** generating via Composer and **prior to zipping via Composer.** See that pull request's comments for additional context for mPDF v7.0.0. Use this code in place of v7.0.3's Mpdf.php line 20,819:
-```
-if (!isset($c['miw'])){
-	$c['miw'] = $c['maw'];
-} else {
-	$c['miw'] /= $k;
-}
-```
-* Keep an eye on [https://github.com/mpdf/mpdf/issues/524](https://github.com/mpdf/mpdf/issues/524) so our extension's *get_mpdf()* method can be updated once that's fixed.

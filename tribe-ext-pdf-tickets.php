@@ -1480,30 +1480,25 @@ if (
 			/**
 			 * Filter the arguments with which to run mPDF.
 			 *
-			 * Reference vendor/mpdf/config.php, especially since it may not match the documentation.
+			 * 'c' mode sets the mPDF Mode to use onlyCoreFonts so that we do not need to include any fonts
+			 * (like the dejavu... ones) in vendor/mpdf/mpdf/ttfonts, but we include it anyway in case you
+			 * want to use them.
 			 *
-			 * @since 1.1.0
+			 * @param array $mpdf_args
+			 *
+			 *@see \Mpdf\Mpdf::initConstructorParams() Some of the parameters.
+			 * @see \Mpdf\Config\ConfigVariables        Some of the parameters.
+			 * @see \Mpdf\Config\FontVariables          Some of the parameters.
 			 *
 			 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html An outdated reference.
 			 *
-			 * @param array $mpdf_args
+			 * @since 1.1.0
+			 *
 			 */
 			$mpdf_args = apply_filters( 'tribe_ext_pdf_tickets_mpdf_args', $mpdf_args );
 
 			/**
 			 * Creating and setting the PDF
-			 *
-			 * Reference vendor/mpdf/config.php, especially since it may not
-			 * match the documentation.
-			 * 'c' mode sets the mPDF Mode to use onlyCoreFonts so that we do not
-			 * need to include any fonts (like the dejavu... ones) in
-			 * vendor/mpdf/mpdf/ttfonts
-			 * Therefore, this entire ttfonts directory is non-existent in the .zip
-			 * build via Composer, which changes saves over 90 MB disk space
-			 * unzipped and the .zip itself goes from over 40 MB to under 3 MB.
-			 *
-			 * @link https://mpdf.github.io/reference/mpdf-variables/overview.html
-			 * @link https://github.com/mpdf/mpdf/pull/490
 			 */
 			try {
 				$mpdf = new \Mpdf\Mpdf( $mpdf_args );

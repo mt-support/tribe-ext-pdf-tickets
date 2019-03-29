@@ -1405,7 +1405,7 @@ if (
 		 * Outputs PDF.
 		 *
 		 * @see  Tribe__Extension__PDF_Tickets::get_mpdf()
-		 * @see  Mpdf::Output()
+		 * @see  \Mpdf\Mpdf::Output()
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-functions/output.html
 		 *
@@ -1459,11 +1459,11 @@ if (
 		 *
 		 * Will return an empty object if mPDF throws an exception.
 		 *
-		 * @see Mpdf::WriteHTML()
+		 * @see \Mpdf\Mpdf::WriteHTML()
 		 *
 		 * @param string $html The full HTML you want converted to a PDF.
 		 *
-		 * @return Mpdf|stdClass|object
+		 * @return \Mpdf\Mpdf|stdClass|object
 		 */
 		protected function get_mpdf( $html ) {
 			require_once( __DIR__ . '/vendor/autoload.php' );

@@ -993,7 +993,8 @@ if (
 		 */
 		public function process_updated_post_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
 			if (
-				Tribe__Tickets_Plus__Meta::META_KEY !== $meta_key
+				! class_exists( 'Tribe__Tickets_Plus__Meta' )
+				|| Tribe__Tickets_Plus__Meta::META_KEY !== $meta_key
 			) {
 				return false;
 			}

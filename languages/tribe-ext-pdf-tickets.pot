@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Event Tickets Extension: PDF Tickets\n"
-"POT-Creation-Date: 2018-05-16 17:20-0500\n"
-"PO-Revision-Date: 2018-05-16 17:20-0500\n"
+"POT-Creation-Date: 2019-03-29 22:44-0500\n"
+"PO-Revision-Date: 2019-03-29 22:44-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: tribe-ext-pdf-tickets.php:158
+#: tribe-ext-pdf-tickets.php:157
 #, php-format
 msgid ""
 "%s requires PHP version %s or newer to work (as well as the `mbstring` and "
@@ -29,23 +29,23 @@ msgid ""
 "updating PHP."
 msgstr ""
 
-#: tribe-ext-pdf-tickets.php:203
+#: tribe-ext-pdf-tickets.php:202
 #, php-format
 msgid "Permalinks must be enabled in order to use %s."
 msgstr ""
 
-#: tribe-ext-pdf-tickets.php:211
+#: tribe-ext-pdf-tickets.php:210
 #, php-format
 msgid ""
 "<a href=\"%s\">Change your Permalink settings</a> or deactivate this plugin."
 msgstr ""
 
-#: tribe-ext-pdf-tickets.php:532
+#: tribe-ext-pdf-tickets.php:523
 msgctxt "The URL rewrite base for a PDF Ticket file download"
 msgid "download"
 msgstr ""
 
-#: tribe-ext-pdf-tickets.php:1248
+#: tribe-ext-pdf-tickets.php:1238
 msgctxt "The anchor text for a PDF Ticket link"
 msgid "PDF Ticket"
 msgstr ""
@@ -55,7 +55,7 @@ msgid "Event Tickets Extension: PDF Tickets"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://github.com/mt-support/tribe-ext-pdf-tickets"
+msgid "https://theeventscalendar.com/extensions/pdf-tickets/"
 msgstr ""
 
 #. Description of the plugin/theme

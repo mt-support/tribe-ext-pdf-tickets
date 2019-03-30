@@ -693,6 +693,8 @@ if (
 		/**
 		 * Create PDF, save to server, and add to email queue.
 		 *
+		 * @see tribe_tickets_get_template_part()
+		 *
 		 * @param int  $attendee_id ID of attendee ticket.
 		 * @param bool $email       Add PDF to email attachments array.
 		 *
@@ -737,16 +739,19 @@ if (
 			}
 
 			/**
-			 * Because $html is the full HTML DOM sent to the PDF generator, adding
-			 * anything to the beginning or the end would likely cause problems.
-			 *
-			 * If you want to alter what gets sent to the PDF generator, follow the
-			 * Themer's Guide for tickets/email.php or use that template file's
-			 * existing hooks.
+			 * To have a PDF Ticket template different from the email template, create a file at
+			 * [your-theme]/tribe-events/tickets/pdf-tickets.php
+			 * that includes the full HTML DOM sent to the PDF generator.
+			 * If you do not have this file, Event Tickets' `tickets/email.php` template logic will be used, including
+			 * allowing child theme overrides from the Themer's Guide and firing that file's hooks.
 			 *
 			 * @link https://theeventscalendar.com/knowledgebase/themers-guide/#tickets
 			 */
-			$html = $ticket_instance->generate_tickets_email_content( $attendees_array );
+			$html = tribe_tickets_get_template_part( 'tickets/pdf-tickets', null, [ 'tickets' => $attendees_array ], false );
+
+			if ( empty( $html ) ) {
+				$html = $ticket_instance->generate_tickets_email_content( $attendees_array );
+			}
 
 			if ( empty( $html ) ) {
 				return $successful;

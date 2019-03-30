@@ -37,6 +37,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 = 1.2.0 2019-03-29 =
 
+* Feature - Ability to have a PDF Ticket template separate from Email template by creating a full HTML DOM file at `[your-theme]/tribe-events/tickets/pdf-tickets.php` [122414]
 * Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases [122622]
 * Fix - Avoid fatal on Events List admin screen when Event Tickets Plus is not active
 * Tweak - Fixed notices around caching directories

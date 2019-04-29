@@ -207,7 +207,7 @@ if (
 				if ( 'options-permalink.php' !== $pagenow ) {
 					$message .= '<p>';
 
-					$message .= sprintf( __( '<a href="%s">Change your Permalink settings</a> or deactivate this plugin.', esc_url( admin_url( 'options-permalink.php' ) ), 'tribe-ext-pdf-tickets' ) );
+					$message .= sprintf( __( '<a href="%s">Change your Permalink settings</a> or deactivate this plugin.', 'tribe-ext-pdf-tickets' ), esc_url( admin_url( 'options-permalink.php' ) ) );
 
 					$message .= '</p>';
 				}

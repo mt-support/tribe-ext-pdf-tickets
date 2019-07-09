@@ -5,7 +5,7 @@ Tags: events, calendar
 Requires at least: 4.5
 Tested up to: 5.1.1
 Requires PHP: 5.6
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPL version 2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,11 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 == Changelog ==
 
-= 1.2.0 2019-03-29 =
+= [1.2.1] 2019-TBD =
+
+* Fix - No longer throws fatal error when Permalinks are disabled
+
+= [1.2.0] 2019-03-29 =
 
 * Feature - Ability to have a PDF Ticket template separate from Email template by creating a full HTML DOM file at `[your-theme]/tribe-events/tickets/pdf-tickets.php` [122414]
 * Fix - Compatibility with the latest Event Tickets and Event Tickets Plus releases [122622]
@@ -44,7 +48,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 * Tweak - Add "WC tested up to" to plugin header to avoid the "Not tested with the active version of WooCommerce" message within the WooCommerce Status page [117703]
 * Tweak - Update mPDF library from version 7.0.3 to version 8.0.0
 
-= 1.1.0 2018-05-16 =
+= [1.1.0] 2018-05-16 =
 
 * Feature - Added support for Tribe Commerce PayPal tickets
 * Feature - Added new public methods: `delete_all_tickets_for_event()`, `delete_all_tickets_for_event()`, `delete_single_pdf_ticket()`
@@ -59,7 +63,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 * Fix - WooCommerce - PDF email attachments now work when performing "Resend tickets email" from WooCommerce's "Edit order" wp-admin screen
 * Fix - Corrected text domain, load text domain, and add a .pot file to make this extension plugin translatable
 
-= 1.0.0 2017-12-06 =
+= [1.0.0] 2017-12-06 =
 
 * Initial release
 * Requirements:

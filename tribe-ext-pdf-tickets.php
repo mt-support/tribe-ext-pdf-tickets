@@ -707,6 +707,7 @@ if (
 		 * Create PDF, save to server, and add to email queue.
 		 *
 		 * @see tribe_tickets_get_template_part()
+		 * @see \Tribe__Extension__PDF_Tickets::output_pdf()
 		 *
 		 * @param int  $attendee_id ID of attendee ticket.
 		 * @param bool $email       Add PDF to email attachments array.
@@ -723,6 +724,8 @@ if (
 			if ( empty( $ticket_class ) ) {
 				return $successful;
 			}
+
+			$event_id = false;
 
 			// should only be one result
 			$event_ids = tribe_tickets_get_event_ids( $attendee_id );
@@ -1442,8 +1445,6 @@ if (
 		 *                          S: return the document as a string.
 		 *                          $filename is ignored.
 		 *
-		 * @throws MpdfException if there is an issue generating the PDF.
-		 *
 		 * @return bool
 		 */
 		protected function output_pdf( $html, $file_name, $dest = 'F' ) {
@@ -1462,12 +1463,17 @@ if (
 			/** @var Mpdf $mpdf */
 			$mpdf = $this->get_mpdf( $html );
 
-			if ( ! empty( $mpdf ) ) {
-				@$mpdf->Output( $file_name, $dest );
-
-				return true;
-			} else {
+			if ( empty( $mpdf ) ) {
 				return false;
+			} else {
+				try {
+					$mpdf->Output( $file_name, $dest );
+
+					return true;
+				}
+				catch ( MpdfException $e ) {
+					return false;
+				}
 			}
 		}
 

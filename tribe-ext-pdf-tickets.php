@@ -52,12 +52,19 @@ if (
 		public $pdf_retry_url_query_arg_key = 'tribe_ext_pdf_tickets_retry';
 
 		/**
-		 * An array of the absolute file paths of the PDF(s) to be attached
-		 * to the ticket email.
+		 * A running count of the number of PDFs, such as if multiple tickets were purchased within a single Order.
+		 *
+		 * @var int Should be incremented prior to using, such as within an array's associative key.
+		 */
+		protected $attachment_count = 0;
+
+		/**
+		 * An array of the absolute file paths of the PDF(s) to be attached to the ticket email.
 		 *
 		 * One PDF attachment per attendee, even in a single order.
 		 *
-		 * @var array
+		 * @var array Numerically indexed or associative array for WooCommerce with a key like `woo_{order_id}_{count}`
+		 *            with the PDF absolute file path as the value.
 		 */
 		protected $attachments_array = [];
 
@@ -103,14 +110,14 @@ if (
 		 * Check required plugins after all Tribe plugins have loaded.
 		 *
 		 * @since 1.0.0
-		 * @since 1.2.1 Use tribe() for dependency class.
+		 * @since 1.2.1 Use tribe() for dependency class and require ET+ 4.7+ because of `$woo_tickets->attendee_order_key`.
 		 */
 		public function required_tribe_classes() {
 			/** @var Tribe__Dependency $dep */
 			$dep = tribe( Tribe__Dependency::class );
 
 			if ( $dep->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
-				$this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.5.6' );
+				$this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.7' );
 
 				if ( $dep->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
 					$this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.4.3' );
@@ -814,7 +821,13 @@ if (
 				true === $successful
 				&& true === $email
 			) {
-				$this->attachments_array[] = $file_name;
+				$this->attachment_count ++;
+
+				if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
+					$this->add_woo_pdf_to_attachments_list( $attendee_id, $file_name );
+				} else {
+					$this->attachments_array[] = $file_name;
+				}
 
 				if ( 'Tribe__Tickets__RSVP' === $ticket_class ) {
 					add_filter( 'tribe_rsvp_email_attachments', [ $this, 'email_attach_pdf' ] );
@@ -841,6 +854,43 @@ if (
 			}
 
 			return $successful;
+		}
+
+		/**
+		 * Given a WooCommerce Ticket's Attendee ID, get the WooCommerce Order ID and add the PDF file to the
+		 * attachments array with the Order ID as the array key.
+		 *
+		 * If the attachments array has non-matching array key(s), clear out attachments array and add this new PDF.
+		 * We do this to avoid the issue of bulk Complete orders in WooCommerce wp-admin causing email 1 to have its PDF
+		 * and then email 2 including both email 2's PDF plus email 1's PDF (yikes!).
+		 *
+		 * @param $attendee_id
+		 * @param $file_name
+		 */
+		private function add_woo_pdf_to_attachments_list( $attendee_id, $file_name ) {
+			$woo_tickets  = tribe( 'tickets-plus.commerce.woo' );
+			$woo_order_id = get_post_meta( $attendee_id, $woo_tickets->attendee_order_key, true );
+
+			if (
+				empty( $woo_order_id )
+				|| ! is_numeric( $woo_order_id )
+			) {
+				return;
+			}
+
+			$order_id_array_key = 'woo_' . $woo_order_id;
+
+			// clear out entire array and reset the counter if any items don't start with the same Woo Order ID
+			foreach ( $this->attachments_array as $key => $value ) {
+				if ( 0 !== strpos( $key, 'woo_' . $woo_order_id ) ) {
+					$this->attachments_array = [];
+					$this->attachment_count  = 1;
+					break;
+				}
+			}
+
+			// add to array with key like `woo_84202_1`
+			$this->attachments_array[$order_id_array_key . '_' . $this->attachment_count] = $file_name;
 		}
 
 		/**

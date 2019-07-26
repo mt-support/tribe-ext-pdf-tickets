@@ -104,12 +104,16 @@ if (
 		 * Check required plugins after all Tribe plugins have loaded.
 		 *
 		 * @since 1.0.0
+		 * @since 1.2.1 Use tribe() for dependency class.
 		 */
 		public function required_tribe_classes() {
-			if ( Tribe__Dependency::instance()->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
+			/** @var Tribe__Dependency $dep */
+			$dep = tribe( Tribe__Dependency::class );
+
+			if ( $dep->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
 				$this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.5.6' );
 
-				if ( Tribe__Dependency::instance()->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
+				if ( $dep->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
 					$this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.4.3' );
 				}
 

@@ -37,6 +37,7 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 = [1.2.1] 2019-TBD =
 
+* Fix - Attendee Information from Event Tickets Plus now appears correctly at time of emailing [120683]
 * Fix - No longer throws fatal error when Permalinks are disabled
 
 = [1.2.0] 2019-03-29 =

@@ -15,6 +15,9 @@
  */
 
 // Do not load unless Tribe Common is fully loaded and our class does not yet exist.
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
+
 if (
 	class_exists( 'Tribe__Extension' )
 	&& ! class_exists( 'Tribe__Extension__PDF_Tickets' )
@@ -99,6 +102,8 @@ if (
 
 		/**
 		 * Check required plugins after all Tribe plugins have loaded.
+		 *
+		 * @since 1.0.0
 		 */
 		public function required_tribe_classes() {
 			if ( Tribe__Dependency::instance()->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
@@ -261,10 +266,13 @@ if (
 		 * Do the PDF upload and attach to email when triggered via the WooCommerce email action hook, which passes the
 		 * Order ID, not the Attendee ID.
 		 *
-		 * @param int|string $order_id
+		 * @since 1.1.0
 		 *
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
+		 *
+		 * @param int|string $order_id
+		 *
 		 */
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
 			$order_id = absint( $order_id );
@@ -413,6 +421,8 @@ if (
 		 *
 		 * @param int $attendee_id
 		 *
+		 * @throws Exception if the provided argument is not a positive integer.
+		 *
 		 * @return string
 		 */
 		private function get_unique_id_from_attendee_id( $attendee_id ) {
@@ -421,7 +431,7 @@ if (
 				! is_int( $attendee_id )
 				|| 0 === absint( $attendee_id )
 			) {
-				throw new Exception( 'You did not pass a valid $attendee_id to Tribe__Extension__PDF_Tickets::get_unique_id_from_attendee_id()' );
+				throw new Exception( 'You did not pass a valid $attendee_id to ' . __METHOD__ );
 			}
 
 			$unique_id = get_post_meta( $attendee_id, $this->pdf_ticket_meta_key, true );
@@ -870,12 +880,12 @@ if (
 		 *
 		 * @since 1.1.0
 		 *
-		 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
-		 * @link https://secure.php.net/manual/function.unlink.php
-		 *
 		 * @see Tribe__Extension__PDF_Tickets::find_all_pdf_ticket_files()
 		 *
-		 * @throws Exception
+		 * @link https://secure.php.net/manual/function.unlink.php
+		 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
+		 *
+		 * @throws Exception if a found file is unable to be deleted.
 		 *
 		 * @return bool
 		 */
@@ -1144,8 +1154,7 @@ if (
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
-		 * @param int $linked_post_type_post_id Applies to all of Tribe Events'
-		 *                                      Linked Post Types.
+		 * @param int $linked_post_type_post_id Applies to all of Tribe Events' Linked Post Types.
 		 * @param WP_Post $post
 		 * @param bool $update
 		 *
@@ -1254,10 +1263,7 @@ if (
 				return '';
 			}
 
-			$output = sprintf(
-				'<a href="%s"',
-				$url
-			);
+			$output = sprintf( '<a href="%s"', $url);
 
 			/**
 			 * Control the link target for Attendees Report links.
@@ -1415,23 +1421,25 @@ if (
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-functions/output.html
 		 *
-		 * @param string $html HTML content to be turned into PDF.
+		 * @param string $html      HTML content to be turned into PDF.
 		 * @param string $file_name Full file name, including path on server.
 		 *                          The name of the file. If not specified, the
 		 *                          document will be sent to the browser
 		 *                          (destination I).
 		 *                          BLANK or omitted: "doc.pdf"
-		 * @param string $dest I: send the file inline to the browser. The
-		 *                     plug-in is used if available.
-		 *                     The name given by $filename is used when one
-		 *                     selects the "Save as" option on the link
-		 *                     generating the PDF.
-		 *                     D: send to the browser and force a file
-		 *                     download with the name given by $filename.
-		 *                     F: save to a local file with the name given by
-		 *                     $filename (may include a path).
-		 *                     S: return the document as a string.
-		 *                     $filename is ignored.
+		 * @param string $dest      I: send the file inline to the browser. The
+		 *                          plug-in is used if available.
+		 *                          The name given by $filename is used when one
+		 *                          selects the "Save as" option on the link
+		 *                          generating the PDF.
+		 *                          D: send to the browser and force a file
+		 *                          download with the name given by $filename.
+		 *                          F: save to a local file with the name given by
+		 *                          $filename (may include a path).
+		 *                          S: return the document as a string.
+		 *                          $filename is ignored.
+		 *
+		 * @throws MpdfException if there is an issue generating the PDF.
 		 *
 		 * @return bool
 		 */
@@ -1441,14 +1449,14 @@ if (
 			}
 
 			/**
-			 * Empty the output buffer to ensure the website page's HTML is not
-			 * included by accident.
+			 * Empty the output buffer to ensure the website page's HTML is not included by accident.
 			 *
 			 * @link https://mpdf.github.io/what-else-can-i-do/capture-html-output.html
 			 * @link https://stackoverflow.com/a/35574170/893907
 			 */
 			@ob_clean();
 
+			/** @var Mpdf $mpdf */
 			$mpdf = $this->get_mpdf( $html );
 
 			if ( ! empty( $mpdf ) ) {
@@ -1469,7 +1477,7 @@ if (
 		 *
 		 * @param string $html The full HTML you want converted to a PDF.
 		 *
-		 * @return \Mpdf\Mpdf|stdClass|object
+		 * @return Mpdf|stdClass|object
 		 */
 		protected function get_mpdf( $html ) {
 			require_once( __DIR__ . '/vendor/autoload.php' );
@@ -1507,7 +1515,7 @@ if (
 			 * Creating and setting the PDF
 			 */
 			try {
-				$mpdf = new \Mpdf\Mpdf( $mpdf_args );
+				$mpdf = new Mpdf( $mpdf_args );
 				$mpdf->WriteHTML( $html );
 			} catch ( Exception $e ) {
 				// an empty Object

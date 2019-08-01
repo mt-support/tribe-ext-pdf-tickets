@@ -54,6 +54,8 @@ if (
 		/**
 		 * A running count of the number of PDFs, such as if multiple tickets were purchased within a single Order.
 		 *
+		 * @since 1.2.1
+		 *
 		 * @var int Should be incremented prior to using, such as within an array's associative key.
 		 */
 		protected $attachment_count = 0;

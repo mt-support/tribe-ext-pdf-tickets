@@ -250,7 +250,8 @@ if (
 
 			// Event Tickets Plus: WooCommerce
 			// Tagging along with Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger(), which passes Order ID, not Attendee ID
-			add_action( 'wootickets-send-tickets-email', [ $this, 'woo_order_id_do_pdf_and_email' ], 1 );
+			// We do not use the `event_tickets_woocommerce_ticket_created` hook (so it's inconsistent from other ticket providers) because of the "Complete Order" part of the Woo process - only create
+			add_action( 'event_tickets_woo_complete_order', [ $this, 'woo_order_id_do_pdf_and_email' ], 1 );
 
 			// After modifying Attendee Information (e.g. self-service), delete its PDF Ticket file so it is no longer outdated.
 			add_action( 'updated_postmeta', [ $this, 'process_updated_post_meta' ], 50, 4 );

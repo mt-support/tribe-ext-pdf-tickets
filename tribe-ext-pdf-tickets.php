@@ -1510,7 +1510,6 @@ if (
 			 */
 			@ob_clean();
 
-			/** @var Mpdf $mpdf */
 			$mpdf = $this->get_mpdf( $html );
 
 			if ( empty( $mpdf ) ) {

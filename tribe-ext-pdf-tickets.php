@@ -284,7 +284,6 @@ if (
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
 		 *
 		 * @param int|string $order_id
-		 *
 		 */
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
 			$order_id = absint( $order_id );

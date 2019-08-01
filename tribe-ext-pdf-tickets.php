@@ -865,8 +865,10 @@ if (
 		 * We do this to avoid the issue of bulk Complete orders in WooCommerce wp-admin causing email 1 to have its PDF
 		 * and then email 2 including both email 2's PDF plus email 1's PDF (yikes!).
 		 *
-		 * @param $attendee_id
-		 * @param $file_name
+		 * @since 1.2.1
+		 *
+		 * @param int $attendee_id Attendee ID.
+		 * @param string $file_name PDF file name.
 		 */
 		private function add_woo_pdf_to_attachments_list( $attendee_id, $file_name ) {
 			$woo_tickets  = tribe( 'tickets-plus.commerce.woo' );
@@ -891,7 +893,7 @@ if (
 			}
 
 			// add to array with key like `woo_84202_1`
-			$this->attachments_array[$order_id_array_key . '_' . $this->attachment_count] = $file_name;
+			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count ] = $file_name;
 		}
 
 		/**

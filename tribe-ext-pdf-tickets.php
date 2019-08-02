@@ -1317,13 +1317,13 @@ if (
 			 */
 			$text = apply_filters( 'tribe_ext_pdf_tickets_link_anchor_text', $text, $attendee_id );
 
-			$url = esc_url( $this->get_pdf_link( $attendee_id ) );
+			$url = $this->get_pdf_link( $attendee_id );
 
-			if ( empty( $url ) ) {
+			if ( empty( esc_url_raw( $url ) ) ) {
 				return '';
 			}
 
-			$output = sprintf( '<a href="%s"', $url);
+			$output = sprintf( '<a href="%s"', esc_url( $url ) );
 
 			/**
 			 * Control the link target for Attendees Report links.

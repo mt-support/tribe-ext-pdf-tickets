@@ -334,21 +334,29 @@ if (
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
 			$order_id = absint( $order_id );
 
-			if ( 0 < $order_id ) {
-				// Runs Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_order_id()
-				$woo_main = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
-
-				$attendee_ids = $woo_main->get_attendees_by_id( $order_id );
-				$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
-
-				// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
-				foreach ( $attendee_ids as $attendee_id ) {
-					$this->do_upload_pdf( $attendee_id );
-				}
-
-				// Now that $this->$attachments_array is expected not empty, send to the WooCommerce email via Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
-				add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
+			if ( empty( $order_id ) ) {
+				return;
 			}
+
+			/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_main */
+			$woo_main = tribe( 'tickets-plus.commerce.woo' );
+
+			/**
+			 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_order_id()
+			 */
+			$attendee_ids = $woo_main->get_attendees_by_id( $order_id );
+			$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
+
+			// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
+			foreach ( $attendee_ids as $attendee_id ) {
+				$this->do_upload_pdf( $attendee_id );
+			}
+
+			/**
+			 * Now that $this->$attachments_array is expected not empty, send to the TPP email.
+			 * @see \Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
+			 */
+			add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
 		}
 
 		/**

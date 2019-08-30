@@ -290,11 +290,9 @@ if (
 		 *
 		 * @see \Tribe__Tickets__Commerce__PayPal__Main::generate_tickets()
 		 *
-		 * @param int $order_id
+		 * @param string $order_id Tribe Commerce PayPal order IDs are like '32X91238935350614'.
 		 */
-		public function tpp_order_id_do_pdf_and_email( $order_id ) {
-			$order_id = absint( $order_id );
-
+		public function tpp_order_id_do_pdf_and_email( $order_id = '' ) {
 			if ( empty( $order_id ) ) {
 				return;
 			}
@@ -332,6 +330,7 @@ if (
 		 * @param int|string $order_id
 		 */
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
+			// WooCommerce Order IDs are numeric
 			$order_id = absint( $order_id );
 
 			if ( empty( $order_id ) ) {

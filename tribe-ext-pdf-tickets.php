@@ -239,7 +239,11 @@ if (
 		 * Cannot run in $this->init() because that is too early to run tribe_get_linked_post_types().
 		 */
 		public function create_pdf_file_creation_deletion_triggers() {
-			// do_upload_pdf() when tickets are created
+			/**
+			 * Event Tickets: RSVP
+			 *
+			 * @see \Tribe__Tickets_Plus__Meta__RSVP::hook() Same hook used by ET+ meta at priority 10.
+			 */
 			add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 
 			/**

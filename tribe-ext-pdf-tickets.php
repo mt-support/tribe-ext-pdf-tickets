@@ -242,8 +242,13 @@ if (
 			// do_upload_pdf() when tickets are created
 			add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 
-			// Event Tickets: Tribe PayPal
-			add_action( 'event_tickets_tpp_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
+			/**
+			 * Event Tickets: Tribe PayPal
+			 *
+			 * @see \Tribe__Tickets_Plus__Commerce__PayPal__Meta::listen_for_ticket_creation() Where ET+ saves meta,
+			 * an action hook prior to the one we use.
+			 */
+			add_action( 'event_tickets_tpp_tickets_generated', [ $this, 'tpp_order_id_do_pdf_and_email' ], 50, 1 );
 
 			// Event Tickets Plus: Easy Digital Downloads (EDD)
 			add_action( 'eddtickets-send-tickets-email', [ $this, 'do_upload_pdf' ], 50, 1 );
@@ -271,6 +276,44 @@ if (
 					add_action( 'save_post_' . $linked_post_type, [ $this, 'process_updated_tribe_event_linked_post_type' ], 50, 3 );
 				}
 			}
+		}
+
+		/**
+		 * Do the PDF upload and attach to email when triggered via the Tribe PayPal tickets generated or send email
+		 * action hooks, which both pass Order ID, not the Attendee ID.
+		 *
+		 * @since 1.2.1
+		 *
+		 * @see \Tribe__Tickets__Commerce__PayPal__Main::generate_tickets()
+		 *
+		 * @param int $order_id
+		 */
+		public function tpp_order_id_do_pdf_and_email( $order_id ) {
+			$order_id = absint( $order_id );
+
+			if ( empty( $order_id ) ) {
+				return;
+			}
+
+			/** @var \Tribe__Tickets__Commerce__PayPal__Main $tpp_main */
+			$tpp_main = tribe( 'tickets.commerce.paypal' );
+
+			/**
+			 * @see \Tribe__Tickets__Commerce__PayPal__Main::get_attendees_by_order_id()
+			 */
+			$attendee_ids = $tpp_main->get_attendees_by_id( $order_id );
+			$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
+
+			// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
+			foreach ( $attendee_ids as $attendee_id ) {
+				$this->do_upload_pdf( $attendee_id );
+			}
+
+			/**
+			 * Now that $this->$attachments_array is expected not empty, send to the TPP email.
+			 * @see \Tribe__Tickets__Commerce__PayPal__Main::send_tickets_email()
+			 */
+			add_filter( 'tribe_tpp_email_attachments', [ $this, 'email_attach_pdf' ] );
 		}
 
 		/**

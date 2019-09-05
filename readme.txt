@@ -35,9 +35,10 @@ We're always interested in your feedback and our [premium forums](https://theeve
 
 == Changelog ==
 
-= [1.2.1] 2019-TBD =
+= [1.2.1] 2019-09-05 =
 
-* Tweak - Now requires Event Tickets Plus version 4.7 or newer.
+* Tweak - Now requires Event Tickets Plus version 4.7 or newer
+* Tweak - "WooCommerce tested up to" version changed from `3.5.7` to `3.7.0`
 * Fix - Attendee Information from Event Tickets Plus now appears correctly at time of emailing [120683]
 * Fix - Bulk completing WooCommerce Orders only includes each Order's applicable PDF attachments [116980]
 * Fix - No longer throws fatal error when Permalinks are disabled

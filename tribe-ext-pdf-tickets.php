@@ -11,7 +11,7 @@
  * License:           GPL version 2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tribe-ext-pdf-tickets
- * WC tested up to:   3.5.7
+ * WC tested up to:   3.7.0
  */
 
 use Mpdf\Mpdf;

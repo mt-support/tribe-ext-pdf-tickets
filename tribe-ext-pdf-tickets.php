@@ -11,10 +11,12 @@
  * License:           GPL version 2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tribe-ext-pdf-tickets
- * WC tested up to:   3.5.7
+ * WC tested up to:   3.7.0
  */
 
-// Do not load unless Tribe Common is fully loaded and our class does not yet exist.
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
+
 if (
 	class_exists( 'Tribe__Extension' )
 	&& ! class_exists( 'Tribe__Extension__PDF_Tickets' )
@@ -50,12 +52,21 @@ if (
 		public $pdf_retry_url_query_arg_key = 'tribe_ext_pdf_tickets_retry';
 
 		/**
-		 * An array of the absolute file paths of the PDF(s) to be attached
-		 * to the ticket email.
+		 * A running count of the number of PDFs, such as if multiple tickets were purchased within a single Order.
+		 *
+		 * @since 1.2.1
+		 *
+		 * @var int Should be incremented prior to using, such as within an array's associative key.
+		 */
+		protected $attachment_count = 0;
+
+		/**
+		 * An array of the absolute file paths of the PDF(s) to be attached to the ticket email.
 		 *
 		 * One PDF attachment per attendee, even in a single order.
 		 *
-		 * @var array
+		 * @var array Numerically indexed or associative array for WooCommerce with a key like `woo_{order_id}_{count}`
+		 *            with the PDF absolute file path as the value.
 		 */
 		protected $attachments_array = [];
 
@@ -92,19 +103,25 @@ if (
 
 			// EDD must be added here, not in $this->init() does not run early enough for these to take effect.
 			// Event Tickets Plus: Easy Digital Downloads
-			add_action( 'event_ticket_edd_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
+			add_action( 'event_tickets_edd_ticket_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 			// Piggy-backing off Tribe__Tickets_Plus__Commerce__EDD__Email::trigger()
 			add_action( 'eddtickets-send-tickets-email', [ $this, 'do_upload_pdf' ], 50, 1 );
 		}
 
 		/**
 		 * Check required plugins after all Tribe plugins have loaded.
+		 *
+		 * @since 1.0.0
+		 * @since 1.2.1 Use tribe() for dependency class and require ET+ 4.7+ because of `$woo_tickets->attendee_order_key`.
 		 */
 		public function required_tribe_classes() {
-			if ( Tribe__Dependency::instance()->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
-				$this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.5.6' );
+			/** @var Tribe__Dependency $dep */
+			$dep = tribe( Tribe__Dependency::class );
 
-				if ( Tribe__Dependency::instance()->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
+			if ( $dep->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
+				$this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.7' );
+
+				if ( $dep->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
 					$this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.4.3' );
 				}
 
@@ -222,18 +239,26 @@ if (
 		 * Cannot run in $this->init() because that is too early to run tribe_get_linked_post_types().
 		 */
 		public function create_pdf_file_creation_deletion_triggers() {
-			// do_upload_pdf() when tickets are created
-			add_action( 'event_tickets_rsvp_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
+			/**
+			 * Event Tickets: RSVP
+			 *
+			 * @see \Tribe__Tickets_Plus__Meta__RSVP::hook() Same hook used by ET+ meta at priority 10.
+			 */
+			add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'do_upload_pdf' ], 50, 1 );
 
-			// Event Tickets: Tribe PayPal
-			add_action( 'event_tickets_tpp_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
+			/**
+			 * Event Tickets: Tribe PayPal
+			 *
+			 * @see \Tribe__Tickets_Plus__Commerce__PayPal__Meta::listen_for_ticket_creation() Where ET+ saves meta,
+			 * an action hook prior to the one we use.
+			 */
+			add_action( 'event_tickets_tpp_tickets_generated', [ $this, 'tpp_order_id_do_pdf_and_email' ], 50, 1 );
+
+			// Event Tickets Plus: Easy Digital Downloads (EDD)
+			add_action( 'eddtickets-send-tickets-email', [ $this, 'do_upload_pdf' ], 50, 1 );
 
 			// Event Tickets Plus: WooCommerce
-			add_action( 'event_ticket_woo_attendee_created', [ $this, 'do_upload_pdf' ], 50, 1 );
-			// Tagging along with Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger(), which passes Order ID, not Attendee ID
 			add_action( 'wootickets-send-tickets-email', [ $this, 'woo_order_id_do_pdf_and_email' ], 1 );
-
-			// EDD must be added in $this->construct(), not here, so it is early enough to take effect.
 
 			// After modifying Attendee Information (e.g. self-service), delete its PDF Ticket file so it is no longer outdated.
 			add_action( 'updated_postmeta', [ $this, 'process_updated_post_meta' ], 50, 4 );
@@ -258,32 +283,79 @@ if (
 		}
 
 		/**
+		 * Do the PDF upload and attach to email when triggered via the Tribe PayPal tickets generated or send email
+		 * action hooks, which both pass Order ID, not the Attendee ID.
+		 *
+		 * @since 1.2.1
+		 *
+		 * @see \Tribe__Tickets__Commerce__PayPal__Main::generate_tickets()
+		 *
+		 * @param string $order_id Tribe Commerce PayPal order IDs are like '32X91238935350614'.
+		 */
+		public function tpp_order_id_do_pdf_and_email( $order_id = '' ) {
+			if ( empty( $order_id ) ) {
+				return;
+			}
+
+			/** @var \Tribe__Tickets__Commerce__PayPal__Main $tpp_main */
+			$tpp_main = tribe( 'tickets.commerce.paypal' );
+
+			/**
+			 * @see \Tribe__Tickets__Commerce__PayPal__Main::get_attendees_by_order_id()
+			 */
+			$attendee_ids = $tpp_main->get_attendees_by_id( $order_id );
+			$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
+
+			// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
+			foreach ( $attendee_ids as $attendee_id ) {
+				$this->do_upload_pdf( $attendee_id );
+			}
+
+			/**
+			 * Now that $this->$attachments_array is expected not empty, send to the TPP email.
+			 * @see \Tribe__Tickets__Commerce__PayPal__Main::send_tickets_email()
+			 */
+			add_filter( 'tribe_tpp_email_attachments', [ $this, 'email_attach_pdf' ] );
+		}
+
+		/**
 		 * Do the PDF upload and attach to email when triggered via the WooCommerce email action hook, which passes the
 		 * Order ID, not the Attendee ID.
 		 *
-		 * @param int|string $order_id
+		 * @since 1.1.0
 		 *
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_id()
 		 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::send_tickets_email()
+		 *
+		 * @param int|string $order_id
 		 */
 		public function woo_order_id_do_pdf_and_email( $order_id = 0 ) {
+			// WooCommerce Order IDs are numeric
 			$order_id = absint( $order_id );
 
-			if ( 0 < $order_id ) {
-				// Runs Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_order_id()
-				$woo_main = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
-
-				$attendee_ids = $woo_main->get_attendees_by_id( $order_id );
-				$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
-
-				// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
-				foreach ( $attendee_ids as $attendee_id ) {
-					$this->do_upload_pdf( $attendee_id );
-				}
-
-				// Now that $this->$attachments_array is expected not empty, send to the WooCommerce email via Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
-				add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
+			if ( empty( $order_id ) ) {
+				return;
 			}
+
+			/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_main */
+			$woo_main = tribe( 'tickets-plus.commerce.woo' );
+
+			/**
+			 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_attendees_by_order_id()
+			 */
+			$attendee_ids = $woo_main->get_attendees_by_id( $order_id );
+			$attendee_ids = wp_list_pluck( $attendee_ids, 'attendee_id' );
+
+			// Now that we have the Attendee IDs, we can do the PDF to build the attachments array
+			foreach ( $attendee_ids as $attendee_id ) {
+				$this->do_upload_pdf( $attendee_id );
+			}
+
+			/**
+			 * Now that $this->$attachments_array is expected not empty, send to the TPP email.
+			 * @see \Tribe__Tickets_Plus__Commerce__WooCommerce__Email::trigger()
+			 */
+			add_filter( 'tribe_tickets_plus_woo_email_attachments', [ $this, 'email_attach_pdf' ] );
 		}
 
 		/**
@@ -413,6 +485,8 @@ if (
 		 *
 		 * @param int $attendee_id
 		 *
+		 * @throws Exception if the provided argument is not a positive integer.
+		 *
 		 * @return string
 		 */
 		private function get_unique_id_from_attendee_id( $attendee_id ) {
@@ -421,7 +495,7 @@ if (
 				! is_int( $attendee_id )
 				|| 0 === absint( $attendee_id )
 			) {
-				throw new Exception( 'You did not pass a valid $attendee_id to Tribe__Extension__PDF_Tickets::get_unique_id_from_attendee_id()' );
+				throw new Exception( 'You did not pass a valid $attendee_id to ' . __METHOD__ );
 			}
 
 			$unique_id = get_post_meta( $attendee_id, $this->pdf_ticket_meta_key, true );
@@ -694,6 +768,7 @@ if (
 		 * Create PDF, save to server, and add to email queue.
 		 *
 		 * @see tribe_tickets_get_template_part()
+		 * @see \Tribe__Extension__PDF_Tickets::output_pdf()
 		 *
 		 * @param int  $attendee_id ID of attendee ticket.
 		 * @param bool $email       Add PDF to email attachments array.
@@ -710,6 +785,8 @@ if (
 			if ( empty( $ticket_class ) ) {
 				return $successful;
 			}
+
+			$event_id = false;
 
 			// should only be one result
 			$event_ids = tribe_tickets_get_event_ids( $attendee_id );
@@ -798,7 +875,13 @@ if (
 				true === $successful
 				&& true === $email
 			) {
-				$this->attachments_array[] = $file_name;
+				$this->attachment_count ++;
+
+				if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $ticket_class ) {
+					$this->add_woo_pdf_to_attachments_list( $attendee_id, $file_name );
+				} else {
+					$this->attachments_array[] = $file_name;
+				}
 
 				if ( 'Tribe__Tickets__RSVP' === $ticket_class ) {
 					add_filter( 'tribe_rsvp_email_attachments', [ $this, 'email_attach_pdf' ] );
@@ -825,6 +908,45 @@ if (
 			}
 
 			return $successful;
+		}
+
+		/**
+		 * Given a WooCommerce Ticket's Attendee ID, get the WooCommerce Order ID and add the PDF file to the
+		 * attachments array with the Order ID as the array key.
+		 *
+		 * If the attachments array has non-matching array key(s), clear out attachments array and add this new PDF.
+		 * We do this to avoid the issue of bulk Complete orders in WooCommerce wp-admin causing email 1 to have its PDF
+		 * and then email 2 including both email 2's PDF plus email 1's PDF (yikes!).
+		 *
+		 * @since 1.2.1
+		 *
+		 * @param int $attendee_id Attendee ID.
+		 * @param string $file_name PDF file name.
+		 */
+		private function add_woo_pdf_to_attachments_list( $attendee_id, $file_name ) {
+			$woo_tickets  = tribe( 'tickets-plus.commerce.woo' );
+			$woo_order_id = get_post_meta( $attendee_id, $woo_tickets->attendee_order_key, true );
+
+			if (
+				empty( $woo_order_id )
+				|| ! is_numeric( $woo_order_id )
+			) {
+				return;
+			}
+
+			$order_id_array_key = 'woo_' . $woo_order_id;
+
+			// clear out entire array and reset the counter if any items don't start with the same Woo Order ID
+			foreach ( $this->attachments_array as $key => $value ) {
+				if ( 0 !== strpos( $key, 'woo_' . $woo_order_id ) ) {
+					$this->attachments_array = [];
+					$this->attachment_count  = 1;
+					break;
+				}
+			}
+
+			// add to array with key like `woo_84202_1`
+			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count ] = $file_name;
 		}
 
 		/**
@@ -870,12 +992,12 @@ if (
 		 *
 		 * @since 1.1.0
 		 *
-		 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
-		 * @link https://secure.php.net/manual/function.unlink.php
-		 *
 		 * @see Tribe__Extension__PDF_Tickets::find_all_pdf_ticket_files()
 		 *
-		 * @throws Exception
+		 * @link https://secure.php.net/manual/function.unlink.php
+		 * @link https://secure.php.net/manual/function.clearstatcache.php unlink() clears the file status cache automatically.
+		 *
+		 * @throws Exception if a found file is unable to be deleted.
 		 *
 		 * @return bool
 		 */
@@ -1144,8 +1266,7 @@ if (
 		 *
 		 * @link https://developer.wordpress.org/reference/hooks/save_post_post-post_type/
 		 *
-		 * @param int $linked_post_type_post_id Applies to all of Tribe Events'
-		 *                                      Linked Post Types.
+		 * @param int $linked_post_type_post_id Applies to all of Tribe Events' Linked Post Types.
 		 * @param WP_Post $post
 		 * @param bool $update
 		 *
@@ -1248,16 +1369,13 @@ if (
 			 */
 			$text = apply_filters( 'tribe_ext_pdf_tickets_link_anchor_text', $text, $attendee_id );
 
-			$url = esc_url( $this->get_pdf_link( $attendee_id ) );
+			$url = $this->get_pdf_link( $attendee_id );
 
-			if ( empty( $url ) ) {
+			if ( empty( esc_url_raw( $url ) ) ) {
 				return '';
 			}
 
-			$output = sprintf(
-				'<a href="%s"',
-				$url
-			);
+			$output = sprintf( '<a href="%s"', esc_url( $url ) );
 
 			/**
 			 * Control the link target for Attendees Report links.
@@ -1415,23 +1533,23 @@ if (
 		 *
 		 * @link https://mpdf.github.io/reference/mpdf-functions/output.html
 		 *
-		 * @param string $html HTML content to be turned into PDF.
+		 * @param string $html      HTML content to be turned into PDF.
 		 * @param string $file_name Full file name, including path on server.
 		 *                          The name of the file. If not specified, the
 		 *                          document will be sent to the browser
 		 *                          (destination I).
 		 *                          BLANK or omitted: "doc.pdf"
-		 * @param string $dest I: send the file inline to the browser. The
-		 *                     plug-in is used if available.
-		 *                     The name given by $filename is used when one
-		 *                     selects the "Save as" option on the link
-		 *                     generating the PDF.
-		 *                     D: send to the browser and force a file
-		 *                     download with the name given by $filename.
-		 *                     F: save to a local file with the name given by
-		 *                     $filename (may include a path).
-		 *                     S: return the document as a string.
-		 *                     $filename is ignored.
+		 * @param string $dest      I: send the file inline to the browser. The
+		 *                          plug-in is used if available.
+		 *                          The name given by $filename is used when one
+		 *                          selects the "Save as" option on the link
+		 *                          generating the PDF.
+		 *                          D: send to the browser and force a file
+		 *                          download with the name given by $filename.
+		 *                          F: save to a local file with the name given by
+		 *                          $filename (may include a path).
+		 *                          S: return the document as a string.
+		 *                          $filename is ignored.
 		 *
 		 * @return bool
 		 */
@@ -1441,8 +1559,7 @@ if (
 			}
 
 			/**
-			 * Empty the output buffer to ensure the website page's HTML is not
-			 * included by accident.
+			 * Empty the output buffer to ensure the website page's HTML is not included by accident.
 			 *
 			 * @link https://mpdf.github.io/what-else-can-i-do/capture-html-output.html
 			 * @link https://stackoverflow.com/a/35574170/893907
@@ -1451,12 +1568,17 @@ if (
 
 			$mpdf = $this->get_mpdf( $html );
 
-			if ( ! empty( $mpdf ) ) {
-				@$mpdf->Output( $file_name, $dest );
-
-				return true;
-			} else {
+			if ( empty( $mpdf ) ) {
 				return false;
+			} else {
+				try {
+					$mpdf->Output( $file_name, $dest );
+
+					return true;
+				}
+				catch ( MpdfException $e ) {
+					return false;
+				}
 			}
 		}
 
@@ -1469,7 +1591,7 @@ if (
 		 *
 		 * @param string $html The full HTML you want converted to a PDF.
 		 *
-		 * @return \Mpdf\Mpdf|stdClass|object
+		 * @return Mpdf|stdClass|object
 		 */
 		protected function get_mpdf( $html ) {
 			require_once( __DIR__ . '/vendor/autoload.php' );
@@ -1507,7 +1629,7 @@ if (
 			 * Creating and setting the PDF
 			 */
 			try {
-				$mpdf = new \Mpdf\Mpdf( $mpdf_args );
+				$mpdf = new Mpdf( $mpdf_args );
 				$mpdf->WriteHTML( $html );
 			} catch ( Exception $e ) {
 				// an empty Object

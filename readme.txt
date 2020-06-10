@@ -3,9 +3,9 @@ Contributors: ModernTribe
 Donate link: http://m.tri.be/29
 Tags: events, calendar
 Requires at least: 4.5
-Tested up to: 5.1.1
+Tested up to: 5.4.1
 Requires PHP: 5.6
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPL version 2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,9 +31,14 @@ Please visit our [extension library](https://theeventscalendar.com/extensions/) 
 
 = What if I experience problems? =
 
-We're always interested in your feedback and our [premium forums](https://theeventscalendar.com/support-forums/) are the best place to flag any issues. Do note, however, that the degree of support we provide for extensions like this one tends to be very limited.
+We're always interested in your feedback, and our [premium forums](https://theeventscalendar.com/support-forums/) are the best place to flag any issues. Do note, however, that the degree of support we provide for extensions like this one tends to be very limited.
 
 == Changelog ==
+
+= [1.2.2] 2020-06-10 =
+
+* Fix - Update mPDF library version so this plugin now works with PHP 7.4. [EXT-211]
+* Tweak - "WooCommerce tested up to" version changed from `3.7.0` to `4.2.0`. [EXT-211]
 
 = [1.2.1] 2019-09-05 =
 

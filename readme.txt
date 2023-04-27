@@ -1,12 +1,12 @@
 === Event Tickets Extension: PDF Tickets ===
-Contributors: ModernTribe
-Donate link: http://m.tri.be/29
+Contributors: theeventscalendar
+Donate link: http://evnt.is/29
 Tags: events, calendar
-Requires at least: 4.5
-Tested up to: 5.4.1
-Requires PHP: 5.6
-Stable tag: 1.2.2
-License: GPL version 2
+Requires at least: 5.8.5
+Tested up to: 6.2
+Requires PHP: 7.4
+Stable tag: 1.2.3
+License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.
@@ -34,6 +34,11 @@ Please visit our [extension library](https://theeventscalendar.com/extensions/) 
 We're always interested in your feedback, and our [premium forums](https://theeventscalendar.com/support-forums/) are the best place to flag any issues. Do note, however, that the degree of support we provide for extensions like this one tends to be very limited.
 
 == Changelog ==
+
+= [1.2.3] 2023-04-27 =
+
+* Fix - Update the attachment handling for WooCommerce tickets in Outlook.
+* Tweak - "WooCommerce tested up to" version changed from `4.2.0` to `7.6.1`.
 
 = [1.2.2] 2020-06-10 =
 

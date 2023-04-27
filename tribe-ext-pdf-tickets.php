@@ -946,7 +946,7 @@ if (
 			}
 
 			// add to array with key like `woo_84202_1`
-			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count ] = $file_name;
+			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count . '.pdf' ] = $file_name;
 		}
 
 		/**

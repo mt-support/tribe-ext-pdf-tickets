@@ -2,16 +2,16 @@
 /**
  * Plugin Name:       Event Tickets Extension: PDF Tickets
  * Description:       Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.
- * Version:           1.2.2
+ * Version:           1.2.3
  * Extension Class:   Tribe__Extension__PDF_Tickets
  * Plugin URI:        https://theeventscalendar.com/extensions/pdf-tickets/
  * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
- * Author:            Modern Tribe, Inc.
- * Author URI:        http://m.tri.be/1971
+ * Author:            The Events Calendar
+ * Author URI:        http://evnt.is/1971
  * License:           GPL version 2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       tribe-ext-pdf-tickets
- * WC tested up to:   4.2.0
+ * WC tested up to:   7.6.1
  */
 
 use Mpdf\Mpdf;
@@ -946,7 +946,7 @@ if (
 			}
 
 			// add to array with key like `woo_84202_1`
-			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count ] = $file_name;
+			$this->attachments_array[ $order_id_array_key . '_' . $this->attachment_count . '.pdf' ] = $file_name;
 		}
 
 		/**

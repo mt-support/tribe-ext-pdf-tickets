@@ -16,11 +16,9 @@
 
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
+use \Tribe__Extension;
 
-if (
-	class_exists( 'Tribe__Extension' )
-	&& ! class_exists( 'Tribe__Extension__PDF_Tickets' )
-) {
+if ( ! class_exists( 'Tribe__Extension__PDF_Tickets' ) ) {
 	/**
 	 * Extension main class, class begins loading on init() function.
 	 */
@@ -85,7 +83,7 @@ if (
 		 * This always executes even if the required plugins are not present.
 		 */
 		public function construct() {
-			$this->add_required_plugin( 'Tribe__Tickets__Main', '4.5.2' );
+			$this->add_required_plugin( 'Tribe__Tickets__Main', '5.6.1.2' );
 
 			add_action( 'tribe_plugins_loaded', [ $this, 'required_tribe_classes' ], 0 );
 

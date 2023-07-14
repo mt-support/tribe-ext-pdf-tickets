@@ -1,5 +1,5 @@
 {
-  "name": "moderntribe/tribe-ext-pdf-tickets",
+  "name": "the-events-calendar/tribe-ext-pdf-tickets",
   "description": "Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.",
   "type": "project",
   "require": {
@@ -8,7 +8,7 @@
   "license": "GPL-2.0-only",
   "authors": [
     {
-      "name": "Modern Tribe, Inc.",
+      "name": "The Events Calendar",
       "email": "support@theeventscalendar.com"
     }
   ],

@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Event Tickets Extension: PDF Tickets
  * Description:       Event Tickets' RSVP, Tribe Commerce PayPal, WooCommerce, and/or Easy Digital Downloads ticket emails will become PDF files saved to your Uploads directory and then get attached to the ticket emails.
- * Version:           1.2.3
+ * Version:           1.2.4
  * Extension Class:   Tribe__Extension__PDF_Tickets
  * Plugin URI:        https://theeventscalendar.com/extensions/pdf-tickets/
  * GitHub Plugin URI: https://github.com/mt-support/tribe-ext-pdf-tickets
@@ -88,7 +88,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
      * This always executes even if the required plugins are not present.
      */
     public function construct() {
-        $this->add_required_plugin( 'Tribe__Tickets__Main', '5.6.1.2' );
+        $this->add_required_plugin( 'Tribe__Tickets__Main', '5.6.2' );
 
         add_action( 'tribe_plugins_loaded', [ $this, 'required_tribe_classes' ], 0 );
 
@@ -122,10 +122,10 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
         $dep = tribe( Tribe__Dependency::class );
 
         if ( $dep->is_plugin_active( 'Tribe__Tickets_Plus__Main' ) ) {
-            $this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '4.7' );
+            $this->add_required_plugin( 'Tribe__Tickets_Plus__Main', '5.7.2' );
 
             if ( $dep->is_plugin_active( 'Tribe__Events__Community__Tickets__Main' ) ) {
-                $this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.4.3' );
+                $this->add_required_plugin( 'Tribe__Events__Community__Tickets__Main', '4.9.3' );
             }
 
         }
@@ -165,7 +165,7 @@ class Tribe__Extension__PDF_Tickets extends Tribe__Extension {
          *
          * @link https://secure.php.net/manual/en/migration56.new-features.php
          */
-        $php_required_version = '5.6';
+        $php_required_version = '7.4';
 
         if ( version_compare( PHP_VERSION, $php_required_version, '<' ) ) {
             if (

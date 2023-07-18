@@ -5,7 +5,7 @@ Tags: events, calendar
 Requires at least: 5.8.5
 Tested up to: 6.2
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,14 @@ Please visit our [extension library](https://theeventscalendar.com/extensions/) 
 We're always interested in your feedback, and our [premium forums](https://theeventscalendar.com/support-forums/) are the best place to flag any issues. Do note, however, that the degree of support we provide for extensions like this one tends to be very limited.
 
 == Changelog ==
+
+= [1.2.4] 2023-07-18 =
+
+* Version - The PDF Tickets is only compatible with PHP 7.4 or later.
+* Version - The PDF Tickets is only compatible with Event Tickets 5.6.2 or later.
+* Version - The PDF Tickets is only compatible with Event Tickets Plus 5.7.2 or later.
+* Version - The PDF Tickets is only compatible with Community Tickets 4.9.3 or later.
+* Fix - Correct some incompatibility with the new TEC container structure.
 
 = [1.2.3] 2023-04-27 =
 
